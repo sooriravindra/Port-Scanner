@@ -1,0 +1,7 @@
+.spinner
+{
+    background: url('loader.gif') no-repeat ;
+    width: 100px;
+    height: 100px;
+    display: none;
+}

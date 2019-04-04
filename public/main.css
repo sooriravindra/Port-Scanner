@@ -1,3 +1,15 @@
+.container
+{
+    margin:auto;
+    height:500px;
+}
+
+.formdiv,.spinner,.results 
+{
+    top: 50%;
+    position: relative;
+    transform: translateY(-50%);
+}
 .spinner
 {
     background: url('loader.gif') no-repeat ;

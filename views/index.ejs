@@ -16,69 +16,73 @@
     </head>
 
     <body>
-        <!-- Initial DIV -->
-        <div class="col-sm-6 formdiv">
-            <form onsubmit="return onScan();">
-                <div class="form-group row">
+        <div class="container" align="center">
+            <br/>
+            <h1> Port Scanner </h1>
+            <!-- Initial DIV -->
+            <div class="col-sm-6 formdiv">
+                <form onsubmit="return onScan();">
+                    <div class="form-group row">
 
-                    <!-- Validate IP and Network prefix with regex patterns -->
-                    <input type="text" class="form-control" placeholder="IP Address" required 
-                           pattern="((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))(\.((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){3}$" 
-                           title="Enter a valid IP address"/>
-                    <br/>
-                    <br/>
+                        <!-- Validate IP and Network prefix with regex patterns -->
+                        <input type="text" class="form-control" placeholder="IP Address" required 
+                               pattern="((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))(\.((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){3}$" 
+                               title="Enter a valid IP address"/>
+                        <br/>
+                        <br/>
 
-                    <input type="text" class="form-control" placeholder="Network prefix" 
-                           pattern="((2|1)?\d)|(3[0-2])" 
-                           title="Enter a valid network prefix"/>
-                    <br/>
-                    <br/>
+                        <input type="text" class="form-control" placeholder="Network prefix" 
+                               pattern="((2|1)?\d)|(3[0-2])" 
+                               title="Enter a valid network prefix"/>
+                        <br/>
+                        <br/>
 
-                    <button type="submit" class="btn btn-primary mb-2"> 
-                        <span class="fa fa-search"> </span> Start scan 
-                    </button>
+                        <button type="submit" class="btn btn-primary mb-2"> 
+                            <span class="fa fa-search"> </span> Start scan 
+                        </button>
 
-                </div>
-            </form>
-        </div>
+                    </div>
+                </form>
+            </div>
 
-        <!-- Spinner DIV -->
-        <div class="col-sm-6 spinner">
-        </div>
+            <!-- Spinner DIV -->
+            <div class="col-sm-6 spinner">
+            </div>
 
-        <!-- Results DIV -->
-        <div class="col-sm-6 results">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">IP</th>
-                    <th scope="col">Port</th>
-                    <th scope="col">Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <th scope="row">1</th>
-                    <td>10.1.2.3</td>
-                    <td>200</td>
-                    <td>Alive</td>
-                </tr>
-                <tr>
-                    <th scope="row">2</th>
-                    <td>10.1.2.3</td>
-                    <td>201</td>
-                    <td>Alive</td>
-                </tr>
-                <tr>
-                    <th scope="row">3</th>
-                    <td>10.1.2.3</td>
-                    <td>203</td>
-                    <td>Not Alive</td>
-                </tr>
-            </tbody>
-        </table>
+            <!-- Results DIV -->
+            <div class="col-sm-6 results">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">IP</th>
+                        <th scope="col">Port</th>
+                        <th scope="col">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th scope="row">1</th>
+                        <td>10.1.2.3</td>
+                        <td>200</td>
+                        <td>Alive</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">2</th>
+                        <td>10.1.2.3</td>
+                        <td>201</td>
+                        <td>Alive</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">3</th>
+                        <td>10.1.2.3</td>
+                        <td>203</td>
+                        <td>Not Alive</td>
+                    </tr>
+                </tbody>
+            </table>
 
+            </div>
         </div>
 
         <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" 

@@ -3,12 +3,22 @@ from os import environ
 from twisted.internet import reactor
 from autobahn.twisted.wamp import ApplicationSession, ApplicationRunner
 from twisted.internet.defer import inlineCallbacks
+from scanner import start_scan
+
 
 class Component(ApplicationSession):
 
-    def startScan(self):
-        print("Starting port scan")
+    def startScan(self, dest_ip, dport, mode):
+        print("Starting port scan of id")
         # port scanner
+        # dest_ip = '45.33.32.156'
+        # dport = 22
+        # mode = 'syn_scan'
+        timeout = 5
+        status = start_scan(mode,dest_ip,dport,timeout)
+        # publish
+        self.publish("scan.result",status)
+        # return status
         
     def onJoin(self, details):
         print("session attached")

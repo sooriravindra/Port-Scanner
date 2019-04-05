@@ -5,17 +5,21 @@ function sleep(time) {
 
 var applicationSession = null;
 
-function onScan() {
+const onScan = (dest_ip, dport, mode) => {
   console.log("Inside onScan");
 
   // Hide form and show spinner
   $(".formdiv").hide();
   $(".spinner").show();
 
-  applicationSession.publish("scan.start");
+  dest_ip = dest_ip || "45.33.32.156";
+  dport = dport || 22;
+  mode = mode || "syn_scan";
+
+  applicationSession.publish("scan.start", [dest_ip, dport, mode]);
 
   // Display results table after 4s for now
-  sleep(4000).then(() => {
+  sleep(1000).then(() => {
     console.log("Resolved sleep");
     $(".spinner").hide();
     $(".results").show();
@@ -23,7 +27,12 @@ function onScan() {
 
   // Return false to prevent form submission
   return false;
-}
+};
+
+//
+const scanResult = status => {
+  console.log(`Scan Result is ${status}`);
+};
 
 const ROUTER_ENDPOINT = "ws://127.0.0.1:80/ws";
 const APPLICATION_REALM = "realm1";
@@ -38,6 +47,7 @@ const connection = new autobahn.Connection({
 
 connection.onopen = session => {
   applicationSession = session;
+  session.subscribe("scan.result", scanResult);
 };
 
 connection.open();

@@ -21,36 +21,36 @@
             <div class="col-sm-6 formdiv">
                 <img src="logo.png" alt="">
                 <h1 class="mt-3 mb-5"> Port Scanner </h1>
-                <form onsubmit="return onScan();">
+                <form id="scan_request">
 
                     <div class="form-group form-row">
                         <!-- Validate IP and Network prefix with regex patterns -->
-                        <input type="text" class="form-control" placeholder="IP Address" required 
+                        <input name="ip_address" type="text" class="form-control" placeholder="IP Address" required 
                                pattern="((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))(\.((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){3}$" 
                                title="Enter a valid IP address"/>
                     </div>
 
                     <div class="form-group form-row">
-                        <input type="text" class="form-control" placeholder="Network prefix" 
+                        <input name="network_prefix" type="text" class="form-control" placeholder="Network prefix" 
                                pattern="((2|1)?\d)|(3[0-2])" 
                                title="Enter a valid network prefix"/>
                     </div>
 
                     <div class="form-group form-row">
-                        <input type="text" class="form-control col-sm-6" placeholder="Start port" 
+                        <input name="start_port" type="text" class="form-control col-sm-6" placeholder="Start port" 
                                pattern="(\d)+" 
                                title="Enter a valid port"/>
 
-                        <input type="text" class="form-control col-sm-6" placeholder="End port" 
+                        <input name="end_port" type="text" class="form-control col-sm-6" placeholder="End port" 
                                pattern="(\d)+" 
                                title="Enter a valid port"/>
                     </div>
 
                     <div class="form-group form-row">
-                        <select class="form-control" placeholder="Choose mode" >
-                            <option> Normal port scanning </option>
-                            <option> TCP SYN scanning </option>
-                            <option> TCP FIN scanning </option>
+                        <select name="scan_mode" class="form-control" placeholder="Choose mode" >
+                            <option value="normal_scan"> Normal port scanning </option>
+                            <option value="syn_scan"> TCP SYN scanning </option>
+                            <option value="fyn_scanning"> TCP FIN scanning </option>
                         </select>
                     </div>
 

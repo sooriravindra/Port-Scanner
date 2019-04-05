@@ -8,17 +8,18 @@ from scanner import start_scan
 
 class Component(ApplicationSession):
 
-    def startScan(self, dest_ip, dport, mode):
-        print("Starting port scan of id")
+    def startScan(self, params):
         # port scanner
-        # dest_ip = '45.33.32.156'
-        # dport = 22
-        # mode = 'syn_scan'
-        timeout = 5
-        status = start_scan(mode,dest_ip,dport,timeout)
-        # publish
+        dest_ip = params['ip_address'] 
+        network_prefix = params['network_prefix'] 
+        start_port = int(params['start_port']) 
+        end_port = int(params['end_port']) 
+        scan_mode = params['scan_mode'] 
+
+        timeout = 3
+        status = start_scan(scan_mode,dest_ip,start_port,timeout)
+        print("Status of scan is ",status)
         self.publish("scan.result",status)
-        # return status
         
     def onJoin(self, details):
         print("session attached")

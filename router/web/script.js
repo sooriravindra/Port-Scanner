@@ -5,18 +5,18 @@ function sleep(time) {
 
 var applicationSession = null;
 
-const onScan = (dest_ip, dport, mode) => {
+const startScan = scanRequestParams => {
   console.log("Inside onScan");
 
   // Hide form and show spinner
   $(".formdiv").hide();
   $(".spinner").show();
 
-  dest_ip = dest_ip || "45.33.32.156";
-  dport = dport || 22;
-  mode = mode || "syn_scan";
+  // dest_ip = dest_ip || "45.33.32.156";
+  // dport = dport || 22;
+  // mode = mode || "syn_scan";
 
-  applicationSession.publish("scan.start", [dest_ip, dport, mode]);
+  applicationSession.publish("scan.start", [scanRequestParams]);
 
   // Display results table after 4s for now
   sleep(1000).then(() => {
@@ -28,6 +28,21 @@ const onScan = (dest_ip, dport, mode) => {
   // Return false to prevent form submission
   return false;
 };
+
+$(document).ready(() => {
+  $("#scan_request").submit(function(event) {
+    //pack it as a single argument
+    const scanRequestParams = $(this)
+      .serializeArray()
+      .reduce((scanRequestParams, param) => {
+        scanRequestParams[param["name"]] = param["value"];
+        return scanRequestParams;
+      }, {});
+
+    startScan(scanRequestParams);
+    event.preventDefault();
+  });
+});
 
 //
 const scanResult = status => {

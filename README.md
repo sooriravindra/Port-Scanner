@@ -9,27 +9,10 @@
 
 ## Project Structure
 
-Port-Scanner  
-├── frontend              // Code for Front end lives here  
-│   ├── index.js          // The start script  
-│   ├── package.json  
-│   ├── public            // public directory to serve files  
-│   │   ├── loader.gif  
-│   │   ├── main.css      // Front end CSS goes here  
-│   │   └── script.js     // Front end scripts go here  
-│   └── views  
-│       └── index.ejs     // Default front end view which is rendered as HTML  
-├── README.md  
-└── worker                // The worker code goes here  
-|   └── worker.py  
-
 ## Running
 
-cd frontend  
-npm install  
-npm start  
-  
-Go to http://localhost:4321
+
+docker run -v  $PWD/router:/node -u 0 --rm --name=crossbar -it -d -p 80:80 crossbario/crossbar
 
 ## Credits
 

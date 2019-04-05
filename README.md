@@ -20,23 +20,23 @@
 
 ## Project Structure
 
-Port-Scanner/
-├── README.md
-├── router //Crossbar router and web application UI
-│   ├── Dockerfile
-│   └── web
-│       ├── favicon.ico
-│       ├── index.html // HTML frontend
-│       ├── loader.gif
-│       ├── logo.png
-│       ├── script.js // JS for frontend
-│       └── main.css
-└── scanner //Port scanning code, request handlers and workers.
-.   ├── request\_handler.py
-.   ├── scanner.py
-.   ├── test.py
-.   └── worker.py
-
+Port-Scanner/  
+├── README.md  
+├── router //Crossbar router and web application UI  
+│   ├── Dockerfile  
+│   └── web  
+│       ├── favicon.ico  
+│       ├── index.html // HTML frontend  
+│       ├── loader.gif  
+│       ├── logo.png  
+│       ├── script.js // JS for frontend  
+│       └── main.css  
+└── scanner //Port scanning code, request handlers and workers.  
+.   ├── request\_handler.py  
+.   ├── scanner.py  
+.   ├── test.py  
+.   └── worker.py  
+  
 ## Run the code
 
  - Setup the WAMP router.
@@ -54,6 +54,3 @@ Port-Scanner/
 [Scapy](https://scapy.net/) packet crafting library. 
 [Crossbar](https://crossbar.io) networking platform for distributed applications, [Autobahn](https://crossbar.io/autobahn/) for Web Application Messaging Protocol - WAMP.
 Icons by [Wichai.wi](https://www.flaticon.com/authors/wichaiwi)
-
-
-3 directories, 12 files

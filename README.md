@@ -21,7 +21,7 @@ Port-Scanner
 │       └── index.ejs     // Default front end view which is rendered as HTML  
 ├── README.md  
 └── worker                // The worker code goes here  
-    └── worker.py  
+|   └── worker.py  
 
 ## Running
 
@@ -30,3 +30,8 @@ npm install
 npm start  
   
 Go to http://localhost:4321
+
+## Credits
+
+Icons by [Wichai.wi](https://www.flaticon.com/authors/wichaiwi)
+

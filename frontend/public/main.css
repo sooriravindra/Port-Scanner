@@ -1,18 +1,30 @@
+html, body
+{
+    height: 100%;
+    background: #ccdccc;
+}
+
 .container
 {
     margin:auto;
-    height:500px;
+    height:100%;
 }
 
 .formdiv,.spinner,.results 
 {
     top: 50%;
     position: relative;
+    background: #fff;
     transform: translateY(-50%);
+    box-shadow:0px 0px 20px -10px rgba(0,0,0,0.75);
+    padding: 50px;
+    border-radius:50px;
 }
+
 .spinner
 {
     background: url('loader.gif') no-repeat ;
+    background-position: center;
     width: 100px;
     height: 100px;
     display: none;

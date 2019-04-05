@@ -1,21 +1,15 @@
-function sleep(time) {
-  console.log("Inside sleep");
-  return new Promise(resolve => setTimeout(resolve, time));
-}
-
-var applicationSession = null;
+let applicationSession = null;
 
 const startScan = scanRequestParams => {
   // Hide form and show spinner
   $(".formdiv").hide();
   $(".spinner").show();
-
   applicationSession.publish("scan.start", [scanRequestParams]);
 };
 
 $(document).ready(() => {
   $("#scan_request").submit(function(event) {
-    //pack it as a single argument
+    //pack it as a dictionary before sending
     const scanRequestParams = $(this)
       .serializeArray()
       .reduce((scanRequestParams, param) => {

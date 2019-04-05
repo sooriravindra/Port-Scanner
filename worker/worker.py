@@ -8,6 +8,7 @@ from scanner import start_scan
 
 class Component(ApplicationSession):
 
+    @inlineCallbacks
     def startScan(self, params):
         # port scanner
         dest_ip = params['ip_address'] 
@@ -17,9 +18,12 @@ class Component(ApplicationSession):
         scan_mode = params['scan_mode'] 
 
         timeout = 3
-        status = start_scan(scan_mode,dest_ip,start_port,timeout)
-        print("Status of scan is ",status)
-        self.publish("scan.result",status)
+
+        for port in range(start_port,end_port):
+            print(port)
+            status = start_scan(scan_mode,dest_ip,start_port,timeout)
+            print(port,status)
+            yield self.publish("scan.result",{"ip" :  dest_ip, "port" : port, "status" : status})
         
     def onJoin(self, details):
         print("session attached")

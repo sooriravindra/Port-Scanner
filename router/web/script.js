@@ -6,15 +6,9 @@ function sleep(time) {
 var applicationSession = null;
 
 const startScan = scanRequestParams => {
-  console.log("Inside onScan");
-
   // Hide form and show spinner
   $(".formdiv").hide();
   $(".spinner").show();
-
-  // dest_ip = dest_ip || "45.33.32.156";
-  // dport = dport || 22;
-  // mode = mode || "syn_scan";
 
   applicationSession.publish("scan.start", [scanRequestParams]);
 
@@ -24,9 +18,6 @@ const startScan = scanRequestParams => {
     $(".spinner").hide();
     $(".results").show();
   });
-
-  // Return false to prevent form submission
-  return false;
 };
 
 $(document).ready(() => {
@@ -44,9 +35,30 @@ $(document).ready(() => {
   });
 });
 
-//
 const scanResult = status => {
-  console.log(`Scan Result is ${status}`);
+  const ip = status[0]["ip"];
+  const port = status[0]["port"];
+  const scanStatus = parseInt(status[0]["status"]);
+  const results = $("#scan-results");
+  const length = results.length;
+
+  const row = $("<tr/>");
+  const idCell = $("<td/>");
+  const ipCell = $("<td/>");
+  const portCell = $("<td/>");
+  const scanStatusCell = $("<td/>");
+
+  idCell.append(length);
+  ipCell.append(ip);
+  portCell.append(port);
+  scanStatusCell.append(scanStatus == 1 ? "Alive" : "Not Alive");
+
+  row.append(idCell);
+  row.append(ipCell);
+  row.append(portCell);
+  row.append(scanStatusCell);
+
+  results.append(row);
 };
 
 const ROUTER_ENDPOINT = "ws://127.0.0.1:80/ws";

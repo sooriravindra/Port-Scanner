@@ -51,7 +51,7 @@ const scanResult = status => {
   results.append(row);
 };
 
-const ROUTER_ENDPOINT = "ws://127.0.0.1:80/ws";
+const ROUTER_ENDPOINT = "ws://"+location.host+"/ws";
 const APPLICATION_REALM = "realm1";
 
 const url = ROUTER_ENDPOINT;

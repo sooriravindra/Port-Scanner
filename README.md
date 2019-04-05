@@ -2,6 +2,7 @@
 
 [Description](https://www.securitee.org/teaching/cse509/projects/project2.html)
 
+![alt text](https://github.com/sooriravindra/Port-Scanner/blob/master/Block%20Diagram.png)
 
 ## Members : Script\_Buddies
 * Raveendra Soori (raveendra.soori@stonybrook.edu)
@@ -25,12 +26,12 @@ Port-Scanner/
 ├── router //Crossbar router and web application UI  
 │   ├── Dockerfile  
 │   └── web  
-│       ├── favicon.ico  
-│       ├── index.html // HTML frontend  
-│       ├── loader.gif  
-│       ├── logo.png  
-│       ├── script.js // JS for frontend  
-│       └── main.css  
+│   .    ├── favicon.ico  
+│   .    ├── index.html // HTML frontend  
+│   .    ├── loader.gif  
+│   .    ├── logo.png  
+│   .    ├── script.js // JS for frontend  
+│   .    └── main.css  
 └── scanner //Port scanning code, request handlers and workers.  
 .   ├── request\_handler.py  
 .   ├── scanner.py  
@@ -51,6 +52,6 @@ Port-Scanner/
 
 ## Credits
 
-[Scapy](https://scapy.net/) packet crafting library. 
-[Crossbar](https://crossbar.io) networking platform for distributed applications, [Autobahn](https://crossbar.io/autobahn/) for Web Application Messaging Protocol - WAMP.
-Icons by [Wichai.wi](https://www.flaticon.com/authors/wichaiwi)
+* [Scapy](https://scapy.net/) packet crafting library.
+* [Crossbar](https://crossbar.io) networking platform for distributed applications, [Autobahn](https://crossbar.io/autobahn/) for Web Application Messaging Protocol - WAMP.
+* Icons by [Wichai.wi](https://www.flaticon.com/authors/wichaiwi)

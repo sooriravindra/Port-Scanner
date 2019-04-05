@@ -11,13 +11,6 @@ const startScan = scanRequestParams => {
   $(".spinner").show();
 
   applicationSession.publish("scan.start", [scanRequestParams]);
-
-  // Display results table after 4s for now
-  sleep(1000).then(() => {
-    console.log("Resolved sleep");
-    $(".spinner").hide();
-    $(".results").show();
-  });
 };
 
 $(document).ready(() => {
@@ -36,6 +29,9 @@ $(document).ready(() => {
 });
 
 const scanResult = status => {
+  $(".spinner").hide();
+  $(".results").show();
+
   const ip = status[0]["ip"];
   const port = status[0]["port"];
   const scanStatus = parseInt(status[0]["status"]);

@@ -2,7 +2,6 @@
 from os import environ
 from twisted.internet import reactor
 from autobahn.twisted.wamp import ApplicationSession, ApplicationRunner
-from twisted.internet.defer import inlineCallbacks
 from scanner import start_scan
 
 
@@ -16,7 +15,7 @@ class Component(ApplicationSession):
         end_port = int(params['end_port']) 
         scan_mode = params['scan_mode'] 
 
-        timeout = 3
+        timeout = 2
         for port in range(start_port,end_port+1):
             status = start_scan(scan_mode,dest_ip,port,timeout)
             self.publish("scan.result",{"ip" :  dest_ip, "port" : port, "status" : status})

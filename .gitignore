@@ -1,3 +1,4 @@
 *.swp
 *.pyc
 scanner/pyenv/
+mysql-data

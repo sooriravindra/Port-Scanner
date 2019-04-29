@@ -17,7 +17,8 @@ import pymysql
 pymysql.install_as_MySQLdb()
 import MySQLdb
 
-# change it to whatever you want to; 
+# change it to whatever you want to; we are more comfortable with MySQL as a backend
+# Redis could have been used as a backend too 
 result_backend = 'db+mysql://root:123@127.0.0.1:3306/test'
 # use redis or rabbitmq; rabbitmq is more reliable though
 app = Celery('tasks', backend=result_backend, broker='redis://localhost')
@@ -90,15 +91,18 @@ def fyn_scan(dest_ip, dport):
 	
 	response = sr1(IP(dst=dest_ip)/TCP(sport=sport,dport=dport,flags="F"))
 
+	# if you do not get a response then the port is open
 	if response is None:
 		return 1
 
+	# if you get a RST then the port is definiely closed
 	elif response.haslayer(TCP):
 		if response.getlayer(TCP).flags == 0x14:
 			return 0
 	
+	# packets have been filtered/dropped by the firewall
+	# so you would not know the status of the port
 	elif(response.haslayer(ICMP)):
-		# packets have been filtered/dropped by the firewall
 		if (int(response.getlayer(ICMP).type)==3 and int(response.getlayer(ICMP).code) in [1,2,3,9,10,13]):
 			return 2
 	
@@ -110,10 +114,11 @@ def grab_banner(dest_ip, dport):
 	try:
 		s.connect((dest_ip, dport))
 		if dport == 80:
-			#Send some data to remote server
+			#Now make a HTTP GET request to the server over the established TCP connection
 			message = "GET / HTTP/1.1\r\n\r\n"
 			s.sendall(message.encode())
 			banner = s.recv(4096)
+			# parse the http response
 			banner = banner.decode('utf-8')
 			request_line, headers_alone = banner.split('\r\n', 1)
 			message = email.message_from_file(io.StringIO(headers_alone))

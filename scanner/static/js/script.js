@@ -8,17 +8,15 @@ $(document).ready(() => {
     $.post("/submit_task", data).then(status => {
       $(".spinner").hide();
       $(".results").show();
-      $.get("/get_results").then(results => {
-        console.log(JSON.parse(results));
-      });
+      $.get("/get_results").then(results => JSON.parse(results).forEach(render));
     });
   });
 });
 
-const scanResult = status => {
-  const ip = status[0]["ip"];
-  const port = status[0]["port"];
-  const scanStatus = parseInt(status[0]["status"]);
+const render = data => {
+  const ip = data["ip"];
+  const port = data["port"];
+  const scanStatus = parseInt(data["status"]);
   const results = $("#scan-results");
   const length = results.length;
 

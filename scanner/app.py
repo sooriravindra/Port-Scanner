@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request
 from scanner import syn_scan,fyn_scan,grab_banner
-from query_results import get_report
+from query_results import get_results
 import json
 
 # initialize Flask
@@ -11,10 +11,10 @@ def index():
 	return render_template('index.html')
 
 @flask_app.route('/get_results')
-def get_results():
+def scan_results():
 	# searchword = request.args.get('key', '')
-	report = get_report()	
-	return json.dumps(report)
+	results = get_results()	
+	return json.dumps(results)
 
 @flask_app.route('/submit_task', methods=['POST'])
 def submit_task():

@@ -9,7 +9,7 @@ import email
 import io
 import json 
 from celery import Celery
-from celery.signals import task_postrun
+from celery.signals import task_prerun
 from datetime import datetime
 
 # https://stackoverflow.com/questions/39574813/error-loading-mysqldb-module-no-module-named-mysqldb/39575525
@@ -38,8 +38,8 @@ app = Celery('tasks', backend=result_backend, broker='redis://localhost')
 # opening and closing db connections very expensive; couldn't figure out a init and shutdown hook
 # worker_init, worker_shutdown these are the hooks
 # this has to be used in conjunction with result backend 
-@task_postrun.connect()
-def task_postrun(sender=None, **kwds):
+@task_prerun.connect()
+def prerun(sender=None, **kwds):
 	
 	db = MySQLdb.connect(host="127.0.0.1",
                  user="root",
@@ -48,16 +48,14 @@ def task_postrun(sender=None, **kwds):
 	
 	task_id = kwds['task_id']
 	task_name = kwds['task'].name
-	state = kwds['state']
-	task_result = kwds['retval']
 	args = kwds['args']
 	ip = args[0]
 	port = args[1]
 
 	cursor = db.cursor()
 	cursor.execute(
-		'INSERT INTO celery_tasks (task_id, task_name, task_result, state, ip, port) VALUES (%s,%s,%s,%s,%s,%s)',
-		(task_id, task_name, task_result, state, ip, port)
+		'INSERT INTO celery_tasks (task_id, task_name, ip, port) VALUES (%s,%s,%s,%s)',
+		(task_id, task_name, ip, port)
 	)
 
 	db.commit()

@@ -2,7 +2,6 @@
 
 from scapy.all import *
 import socket
-import errno
 # for parsing http raw headers
 # https://stackoverflow.com/questions/4685217/parse-raw-http-headers
 import email
@@ -38,6 +37,7 @@ app = Celery('tasks', backend=result_backend, broker='redis://localhost')
 
 # opening and closing db connections very expensive; couldn't figure out a init and shutdown hook
 # worker_init, worker_shutdown these are the hooks
+# the reason for this is that arguments of the pending tasks is never known
 # this has to be used in conjunction with result backend 
 @task_prerun.connect()
 def prerun(sender=None, **kwds):
@@ -66,22 +66,22 @@ def prerun(sender=None, **kwds):
 def syn_scan(dest_ip, dport):
 	
 	sport = RandShort()
-	timeout = 2
+	timeout = 10
 	
 	response = sr1( IP(dst=dest_ip) /TCP(sport=sport,dport=dport,flags="S"),timeout=timeout)
 	
 	if response is None:
-		return -1
+		return {"status" : "unknown", "payload" : "No Response"}
 
 	if response.haslayer(TCP):
 		# if 20 then its closed; then the server responded with SYN|ACK
 		if response.getlayer(TCP).flags == 0x12:
 			# send rst if the kernel fails to send
 			send_rst = send(IP(dst=dest_ip)/TCP(sport=sport,dport=dport,flags="R"))
-			return 1
+			return {"status" : "open", "payload" : ""}
 		# port is closed ACK|RST
 		elif response.getlayer(TCP).flags == 0x14:
-			return 0
+			return {"status" : "closed", "payload" : ""}
 
 @app.task(name="fyn-scan")
 def fyn_scan(dest_ip, dport):
@@ -89,22 +89,22 @@ def fyn_scan(dest_ip, dport):
 	sport = RandShort()
 	timeout = 10
 	
-	response = sr1(IP(dst=dest_ip)/TCP(sport=sport,dport=dport,flags="F"))
+	response = sr1(IP(dst=dest_ip)/TCP(sport=sport,dport=dport,flags="F"), timeout=timeout)
 
 	# if you do not get a response then the port is open
 	if response is None:
-		return 1
+		return {"status" : "open", "payload" : ""}
 
 	# if you get a RST then the port is definiely closed
 	elif response.haslayer(TCP):
 		if response.getlayer(TCP).flags == 0x14:
-			return 0
+			return {"status" : "closed", "payload" : ""}
 	
 	# packets have been filtered/dropped by the firewall
 	# so you would not know the status of the port
 	elif(response.haslayer(ICMP)):
 		if (int(response.getlayer(ICMP).type)==3 and int(response.getlayer(ICMP).code) in [1,2,3,9,10,13]):
-			return 2
+			return {"status" : "unknown", "payload" : "Blocked by Firewall"}
 	
 @app.task(name="grab-banner")
 def grab_banner(dest_ip, dport):
@@ -130,13 +130,11 @@ def grab_banner(dest_ip, dport):
 
 
 	except socket.error as e:
-		if e.errno == errno.ECONNREFUSED:
-			print("Connection refused")
-		else:
-			print(e)
+			return {"status" : "closed", "payload" : ""}
+
 	s.close()
 
-	return banner 
+	return {"status" : "open", "payload" : banner} 
 
 
 

@@ -8,14 +8,21 @@ import json
 
 def dataMapper(row):
 	result = {}
+	
+	try:
+		scan_result = pickle.loads(row[3])
+		result['scan_result'] = scan_result
+	except e:
+		return []
+	
 	result['id'] = row[0]
 	result['task_id'] = row[1]
-	result['status'] = row[2]
-	result['result'] = json.loads(pickle.loads(row[3]))
+	result['task_status'] = row[2]
 	result['date_done'] = str(row[4])
-	result['task_name'] = row[5]
+	result['scan_type'] = row[5]
 	result['ip'] = row[6]
 	result['port'] = row[7]
+
 	return result
 
 def get_results():
@@ -38,7 +45,10 @@ def get_results():
 	resultSet = cursor.fetchall()
 
 	results = list(map(dataMapper,resultSet)) 
+	results = list(filter(lambda row : len(row) > 0, results)) 
 	
 	db.close()
 
 	return results
+
+print(get_results())

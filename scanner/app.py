@@ -37,8 +37,18 @@ def submit_task():
 	for address in address_list:
 		for port in range(start_port, end_port + 1):
 			tasks.append((str(address),port,master_task_id))
-	
-	jobs = grab_banner.chunks(tasks, 5) 
-	jobs.apply_async()
 
+	port_scanner = None
+	
+	# decide on a correct number currently set to 5
+	if scan_mode == "normal_scan":
+		port_scanner = grab_banner 
+	elif scan_mode == "syn_scan":
+		port_scanner = syn_scan
+	elif scan_mode == "fyn_scan":
+		port_scanner = fyn_scan 
+
+
+	port_scanner.chunks(tasks, 5).apply_async()	
+	
 	return json.dumps({"status" : "OK"})

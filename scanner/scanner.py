@@ -75,9 +75,10 @@ def is_icmp_blocked(response):
 
 	return 1
 
-def is_host_alive(host):
+@app.task(name="ping-sweep")
+def is_host_alive(dest_ip):
 	timeout = 5
-	response = sr1(IP(dst=str(host))/ICMP(), timeout=timeout)
+	response = sr1(IP(dst=str(dest_ip))/ICMP(), timeout=timeout)
  
 	if response is None or is_icmp_blocked(response):
 		return 0

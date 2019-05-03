@@ -15,6 +15,11 @@ def scan_results():
 	results = get_results()	
 	return json.dumps(results)
 
+@flask_app.route('/ping_scan', methods=['POST'])
+def ping_scan():
+	pass 
+
+
 # TODO : do input validation
 @flask_app.route('/submit_task', methods=['POST'])
 def submit_task():

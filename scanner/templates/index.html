@@ -28,16 +28,25 @@
       <div class="center-block navbar-brand mb-0 h1">
         Port Scanner
       </div>
+      <div>
+        <button
+          type="button"
+          class="btn btn-success btn-lg"
+          data-toggle="modal"
+          data-target="#check_live_hosts_modal"
+        >
+          Check Live Hosts
+        </button>
 
-      <!-- Trigger the modal with a button -->
-      <button
-        type="button"
-        class="btn btn-info btn-lg"
-        data-toggle="modal"
-        data-target="#scan_request_modal"
-      >
-        Scan Request
-      </button>
+        <button
+          type="button"
+          class="btn btn-warning btn-lg"
+          data-toggle="modal"
+          data-target="#scan_request_modal"
+        >
+          Scan Request
+        </button>
+      </div>
     </nav>
     <div class="container" align="center">
       <!-- Initial DIV -->
@@ -52,6 +61,7 @@
                 &times;
               </button>
             </div>
+            <!-- Scan Request Modal -->
             <div class="modal-body">
               <div class="formdiv">
                 <img src="logo.png" alt="" />
@@ -125,6 +135,45 @@
           </div>
         </div>
       </div>
+      <!-- End of Scan Request Modal -->
+
+      <!-- Check Live Hosts Modal -->
+      <div id="check_live_hosts_modal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+          <!-- Modal content-->
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">
+                &times;
+              </button>
+            </div>
+            <!-- Scan Request Modal -->
+            <div class="modal-body">
+              <div class="formdiv">
+                <h1 class="mt-3 mb-5">Ping Scan</h1>
+                <form id="check_live_hosts">
+                  <div class="form-group form-row">
+                    <!-- Validate IP and Network prefix with regex patterns -->
+                    <input
+                      name="ip_address"
+                      type="text"
+                      class="form-control"
+                      placeholder="IP Address"
+                      required
+                      pattern="((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))(\.((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){3}$"
+                      title="Enter a valid IP address"
+                    />
+                  </div>
+                  <button type="submit" class="btn btn-info mb-2">
+                    <span class="fa fa-search"> </span> Start Scan
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- End of Check Live Hosts Modal -->
 
       <!-- Spinner DIV -->
       <div class="col-sm-6 spinner"></div>
@@ -137,6 +186,10 @@
         </table>
       </div>
     </div>
+
+    <footer>
+      Copyrights ©2019 Script Buddies
+    </footer>
 
     <script
       src="https://code.jquery.com/jquery-3.4.0.min.js"

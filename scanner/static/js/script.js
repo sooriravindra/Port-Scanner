@@ -2,16 +2,26 @@ $(document).ready(() => {
   //show results
   $.get("/get_results").then(renderResults);
 
-  $("#scan_request").submit(function(event) {
+  $("#scan_request").submit(event => {
     event.preventDefault();
     const data = $(this).serialize();
     $(".spinner").show();
 
     $.post("/submit_task", data).then(status => {
       $(".spinner").hide();
-      $("#scan_request_modal").modal('hide');
+      $("#scan_request_modal").modal("hide");
     });
   });
+});
+
+$("#check_live_hosts").submit(event => {
+  event.preventDefault();
+  const data = $(this).serialize();
+  // $(".spinner").show();
+  $.post("/ping_scan", data).then(status => {
+    console.log(status)
+  })
+  
 });
 
 const renderResults = results => {

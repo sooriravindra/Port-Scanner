@@ -40,18 +40,21 @@ Port-Scanner/
   
 ## Run the code
 
- - Setup the WAMP router.
- - Start the request handler.
- - Start the workers.
-
 ```
-   docker run -v  $PWD/router:/node -u 0 --rm --name=crossbar -it -d -p 80:80 crossbario/crossbar
+   # Start Redis
+   docker run -p -d 6379:6379 redis 
+   # Start MySQL
+   docker run -v $PWD/mysql-data:/var/lib/mysql --name db -d -p 3306:3306 -e MYSQL_ROOT_PASSWORD=123 mysql:latest
+   #To enter mysql server 
+   docker exec -it db /bin/bash
    cd scanner 
-   sudo python request_handler.py
+   #Start Celery Worker
+   sudo celery -A scanner worker
+   #Start Flask
+   python -m flask run
 ```
 
 ## Credits
 
 * [Scapy](https://scapy.net/) packet crafting library.
-* [Crossbar](https://crossbar.io) networking platform for distributed applications, [Autobahn](https://crossbar.io/autobahn/) for Web Application Messaging Protocol - WAMP.
 * Icons by [Wichai.wi](https://www.flaticon.com/authors/wichaiwi)

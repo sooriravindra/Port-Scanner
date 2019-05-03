@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request
 from scanner import syn_scan,fyn_scan,grab_banner
-from query_results import get_results
+from db import get_results, create_master_task
 import json
 import ipaddress
 
@@ -29,13 +29,18 @@ def submit_task():
 	if not network_prefix or not network_prefix.strip():
 		network_prefix = "32"
 
+	# wrap in a try catch
+	master_task_id = create_master_task(dest_ip, network_prefix, start_port, end_port)
+
 	full_address = "{}/{}".format(dest_ip,network_prefix)
 	address_list = ipaddress.ip_network(full_address)
 
-	# not the most ideal way of splitting; can pool ips and ports; 
-	# but think about how to retrieve them while showing it to the user
+	tasks = []
 	for address in address_list:
 		for port in range(start_port, end_port + 1):
-			grab_banner.delay(str(address), port)
+			tasks.append((str(address),port,master_task_id))
+	
+	jobs = grab_banner.chunks(tasks, 5) 
+	jobs.apply_async()
 
 	return json.dumps({"status" : "OK"})

@@ -39,6 +39,7 @@ app = Celery('tasks', backend=result_backend, broker='redis://localhost')
 # worker_init, worker_shutdown these are the hooks
 # the reason for this is that arguments of the pending tasks is never known
 # this has to be used in conjunction with result backend 
+# insert it into database; pass master task as the argument
 @task_prerun.connect()
 def prerun(sender=None, **kwds):
 	
@@ -47,16 +48,19 @@ def prerun(sender=None, **kwds):
                  passwd="123",
                  db="test")
 	
+
 	task_id = kwds['task_id']
 	task_name = kwds['task'].name
-	args = kwds['args']
-	ip = args[0]
-	port = args[1]
+	args = kwds['kwargs']['it']
+	master_task_id = args[0][2]
+
+	# print(master_task_id)
 
 	cursor = db.cursor()
 	cursor.execute(
-		'INSERT INTO celery_tasks (task_id, task_name, ip, port) VALUES (%s,%s,%s,%s)',
-		(task_id, task_name, ip, port)
+		'INSERT INTO `celery_tasks` (`master_task_id`, `task_id`, `task_name`) \
+		VALUES (%s,%s,%s)',
+		(master_task_id, task_id, task_name)
 	)
 
 	db.commit()
@@ -78,7 +82,7 @@ def syn_scan(dest_ip, dport):
 		if response.getlayer(TCP).flags == 0x12:
 			# send rst if the kernel fails to send
 			send_rst = send(IP(dst=dest_ip)/TCP(sport=sport,dport=dport,flags="R"))
-			return {"status" : "open", "payload" : ""}
+			return {"status" : "open", "payload" : "", "ip" : dest_ip, "port" : dport, "scan_type" : "syn_scan"}
 		# port is closed ACK|RST
 		elif response.getlayer(TCP).flags == 0x14:
 			return {"status" : "closed", "payload" : ""}
@@ -93,7 +97,7 @@ def fyn_scan(dest_ip, dport):
 
 	# if you do not get a response then the port is open
 	if response is None:
-		return {"status" : "open", "payload" : ""}
+		return {"status" : "open", "payload" : "", "ip" : dest_ip, "port" : dport, "scan_type" : "fyn_scan"}
 
 	# if you get a RST then the port is definiely closed
 	elif response.haslayer(TCP):
@@ -107,7 +111,8 @@ def fyn_scan(dest_ip, dport):
 			return {"status" : "unknown", "payload" : "Blocked by Firewall"}
 	
 @app.task(name="grab-banner")
-def grab_banner(dest_ip, dport):
+def grab_banner(dest_ip, dport, master_task_id):
+	print(dest_ip, dport)
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	s.settimeout(10)
 	banner = ""
@@ -134,7 +139,7 @@ def grab_banner(dest_ip, dport):
 
 	s.close()
 
-	return {"status" : "open", "payload" : banner} 
+	return {"status" : "open", "payload" : banner, "ip" : dest_ip, "port" : dport, "scan_type" : "banner_grab"} 
 
 
 

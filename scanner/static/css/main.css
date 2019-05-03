@@ -29,6 +29,15 @@ body {
   transform: translateY(-50%);
 }
 
-.results {
-  display: none;
+.results .panel-group{
+  text-align: left;
+}
+
+.job-title{
+  font-size : 18px;
+  font-weight: bold;
+}
+
+.job-title > td{
+  border-top : none;
 }

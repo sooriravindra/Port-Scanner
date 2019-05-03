@@ -9,6 +9,7 @@ $(document).ready(() => {
 
     $.post("/submit_task", data).then(status => {
       $(".spinner").hide();
+      $("#scan_request_modal").modal('hide');
     });
   });
 });

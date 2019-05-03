@@ -14,7 +14,6 @@ def create_master_task(ip, subnet, start_port, end_port):
 
 	cursor = db.cursor()
 
-	# Execute SQL select statement
 	cursor.execute("INSERT INTO `master_tasks` (`ip_address`,`subnet`, `start_port`,`end_port`) \
 		VALUES(%s, %s, %s, %s)", (ip, subnet, start_port, end_port))
 	
@@ -37,8 +36,7 @@ def dataMapper(row):
 	
 	result['task_status'] = row[0]
 	result['date_done'] = str(row[2])
-	result['task_name'] = row[3]
-	result['master_task_id'] = row[4]
+	result['master_task_id'] = row[3]
 
 	return result
 
@@ -53,7 +51,7 @@ def get_results():
 
 	cursor.execute("SELECT `celery_taskmeta`.status, \
 		`celery_taskmeta`.result, `celery_taskmeta`.date_done,\
-		`celery_tasks`.task_name, `celery_tasks`.master_task_id \
+		`celery_tasks`.master_task_id \
 		FROM \
 		`celery_taskmeta` INNER JOIN `celery_tasks` \
 		on `celery_taskmeta`.task_id = `celery_tasks`.task_id")

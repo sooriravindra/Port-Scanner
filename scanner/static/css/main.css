@@ -36,6 +36,7 @@ body {
 .job-title{
   font-size : 18px;
   font-weight: bold;
+  cursor: pointer;
 }
 
 .job-title > td{

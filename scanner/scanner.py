@@ -44,35 +44,53 @@ app = Celery('tasks', backend=result_backend, broker='redis://localhost')
 def prerun(sender=None, **kwds):
 	
 	db = MySQLdb.connect(host="127.0.0.1",
-                 user="root",
-                 passwd="123",
-                 db="test")
+				 user="root",
+				 passwd="123",
+				 db="test")
 	
 
 	task_id = kwds['task_id']
-	task_name = kwds['task'].name
 	args = kwds['kwargs']['it']
 	master_task_id = args[0][2]
 
-	# print(master_task_id)
-
 	cursor = db.cursor()
 	cursor.execute(
-		'INSERT INTO `celery_tasks` (`master_task_id`, `task_id`, `task_name`) \
-		VALUES (%s,%s,%s)',
-		(master_task_id, task_id, task_name)
+		'INSERT INTO `celery_tasks` (`master_task_id`, `task_id`) \
+		VALUES (%s,%s)',
+		(master_task_id, task_id)
 	)
 
 	db.commit()
 	db.close()
 
+
+def is_icmp_blocked(response):
+	if response.haslayer(ICMP):
+		icmp_layer = response.getlayer(ICMP)
+		blocked = int(icmp_layer.type) == 3 and (int(icmp_layer.code) in [1,2,3,9,10,13])
+		if blocked:
+			return 1
+		
+		return 0
+
+	return 1
+
+def is_host_alive(host):
+	timeout = 5
+	response = sr1(IP(dst=str(host))/ICMP(), timeout=timeout)
+ 
+	if response is None or is_icmp_blocked(response):
+		return 0
+	else:
+		return 1 
+
 @app.task(name="syn-scan")
-def syn_scan(dest_ip, dport):
+def syn_scan(dest_ip, dport, master_task_id):
 	
 	sport = RandShort()
 	timeout = 10
 	
-	response = sr1( IP(dst=dest_ip) /TCP(sport=sport,dport=dport,flags="S"),timeout=timeout)
+	response = sr1( IP(dst=dest_ip) / TCP(sport=sport,dport=dport,flags="S"),timeout=timeout)
 	
 	if response is None:
 		return {"status" : "unknown", "payload" : "No Response"}
@@ -88,7 +106,7 @@ def syn_scan(dest_ip, dport):
 			return {"status" : "closed", "payload" : ""}
 
 @app.task(name="fyn-scan")
-def fyn_scan(dest_ip, dport):
+def fyn_scan(dest_ip, dport, master_task_id):
 
 	sport = RandShort()
 	timeout = 10

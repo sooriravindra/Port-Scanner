@@ -4,7 +4,6 @@ from db import get_results, create_master_task
 import json
 import ipaddress
 
-# initialize Flask
 flask_app = Flask(__name__)
 
 @flask_app.route('/')
@@ -13,7 +12,6 @@ def index():
 
 @flask_app.route('/get_results')
 def scan_results():
-	# searchword = request.args.get('key', '')
 	results = get_results()	
 	return json.dumps(results)
 

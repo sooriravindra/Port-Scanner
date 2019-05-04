@@ -2,26 +2,26 @@ $(document).ready(() => {
   //show results
   $.get("/get_results").then(renderResults);
 
-  $("#scan_request").submit(event => {
+  $("#scan_request").submit(function(event) {
     event.preventDefault();
     const data = $(this).serialize();
     $(".spinner").show();
 
-    $.post("/submit_task", data).then(status => {
+    $.post("/port_scan", data).then(status => {
       $(".spinner").hide();
       $("#scan_request_modal").modal("hide");
     });
   });
 });
 
-$("#check_live_hosts").submit(event => {
+$("#check_live_hosts").submit(function(event) {
   event.preventDefault();
   const data = $(this).serialize();
-  // $(".spinner").show();
+  $(".spinner").show();
   $.post("/ping_scan", data).then(status => {
-    console.log(status)
-  })
-  
+    $(".spinner").hide();
+    $("#check_live_hosts_modal").modal("hide");
+  });
 });
 
 const renderResults = results => {

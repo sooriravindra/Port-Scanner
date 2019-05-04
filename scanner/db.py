@@ -5,7 +5,25 @@ pymysql.install_as_MySQLdb()
 import MySQLdb
 import pickle
 
-def create_master_task(ip, subnet, start_port, end_port):
+
+def associate_master_celery_task(master_task_id, task_id):
+	db = MySQLdb.connect(host="127.0.0.1",
+				 user="root",
+				 passwd="123",
+				 db="test")
+	
+	cursor = db.cursor()
+	cursor.execute(
+		'INSERT INTO `celery_tasks` (`master_task_id`, `task_id`) \
+		VALUES (%s,%s)',
+		(master_task_id, task_id)
+	)
+
+	db.commit()
+	db.close()
+
+
+def create_master_task(ip, subnet, task_type, start_port, end_port):
 	# mater_tasks
 	db = MySQLdb.connect(host="127.0.0.1",
 	                     user="root",
@@ -14,8 +32,8 @@ def create_master_task(ip, subnet, start_port, end_port):
 
 	cursor = db.cursor()
 
-	cursor.execute("INSERT INTO `master_tasks` (`ip_address`,`subnet`, `start_port`,`end_port`) \
-		VALUES(%s, %s, %s, %s)", (ip, subnet, start_port, end_port))
+	cursor.execute("INSERT INTO `master_tasks` (`ip_address`,`subnet`, `task_type`, `start_port`,`end_port`) \
+		VALUES(%s, %s, %s, %s, %s)", (ip, subnet, task_type, start_port, end_port))
 	
 	masterTaskId = cursor.lastrowid
 

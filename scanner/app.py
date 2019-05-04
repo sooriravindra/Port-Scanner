@@ -1,8 +1,8 @@
 from flask import Flask, render_template, request
-from scanner import syn_scan,fyn_scan,grab_banner
+from scanner import syn_scan,fyn_scan,grab_banner, ping_scan
 from db import get_results, create_master_task
 import json
-import ipaddress
+from utils import get_ip_range
 
 flask_app = Flask(__name__)
 
@@ -15,33 +15,39 @@ def scan_results():
 	results = get_results()	
 	return json.dumps(results)
 
+# TODO : validation
 @flask_app.route('/ping_scan', methods=['POST'])
-def ping_scan():
-	pass 
+def ping_scan_request():
+	dest_ip = request.form['ip_address'] 
+	network_prefix = request.form['network_prefix']
+
+	master_task_id = create_master_task(dest_ip, network_prefix, "ping_scan", -1, -1)
+
+	address_list = get_ip_range(dest_ip, network_prefix)
+	address_list = map(lambda address : (master_task_id, str(address)), address_list)
+	ping_scan.chunks(address_list, 5).apply_async()	
+	
+	return json.dumps({"status" : "OK"})
 
 
 # TODO : do input validation
-@flask_app.route('/submit_task', methods=['POST'])
-def submit_task():
+@flask_app.route('/port_scan', methods=['POST'])
+def port_scan_request():
 	dest_ip = request.form['ip_address'] 
 	network_prefix = request.form['network_prefix'] 
 	start_port = int(request.form['start_port']) 
 	end_port = int(request.form['end_port']) 
 	scan_mode = request.form['scan_mode'] 
 	
-	if not network_prefix or not network_prefix.strip():
-		network_prefix = "32"
+	address_list = get_ip_range(dest_ip, network_prefix) 
 
 	# wrap in a try catch
-	master_task_id = create_master_task(dest_ip, network_prefix, start_port, end_port)
-
-	full_address = "{}/{}".format(dest_ip,network_prefix)
-	address_list = ipaddress.ip_network(full_address)
+	master_task_id = create_master_task(dest_ip, network_prefix, scan_mode, start_port, end_port)
 
 	tasks = []
 	for address in address_list:
 		for port in range(start_port, end_port + 1):
-			tasks.append((str(address),port,master_task_id))
+			tasks.append((master_task_id, str(address),port))
 
 	port_scanner = None
 	
@@ -52,7 +58,6 @@ def submit_task():
 		port_scanner = syn_scan
 	elif scan_mode == "fyn_scan":
 		port_scanner = fyn_scan 
-
 
 	port_scanner.chunks(tasks, 5).apply_async()	
 	

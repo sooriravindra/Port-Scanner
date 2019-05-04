@@ -47,6 +47,7 @@ def dataMapper(row):
 	
 	try:
 		scan_result = pickle.loads(row[1])
+		print(scan_result)
 		scan_result = list(filter(lambda host : host['status'] == 'open', scan_result))
 		result['scan_result'] = scan_result
 	except:

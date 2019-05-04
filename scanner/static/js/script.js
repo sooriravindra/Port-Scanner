@@ -65,7 +65,6 @@ const getResultRow = data => {
   const scanPayload = data["payload"];
   const ip = data["ip"];
   const port = data["port"];
-  const scanType = data["scan_type"];
 
   const row = $("<tr>");
   const ipCell = $("<td>", {
@@ -73,9 +72,6 @@ const getResultRow = data => {
   });
   const portCell = $("<td>", {
     text: port
-  });
-  const scanTypeCell = $("<td>", {
-    text: scanType
   });
   const portStatusCell = $("<td>", {
     text: portStatus
@@ -86,7 +82,6 @@ const getResultRow = data => {
 
   row.append(ipCell);
   row.append(portCell);
-  row.append(scanTypeCell);
   row.append(portStatusCell);
   row.append(scanPayloadCell);
 

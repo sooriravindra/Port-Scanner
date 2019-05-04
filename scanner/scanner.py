@@ -53,7 +53,7 @@ def ping_scan(master_task_id, dest_ip):
 	if response is None or is_icmp_blocked(response):
 		return {"status" : "unknown"} 
 	else:
-		return {"status" : "alive", "ip" : dest_ip, "scan_type" : "ping_sweep"} 
+		return {"status" : "open", "ip" : dest_ip, "scan_type" : "ping_sweep"} 
 
 @app.task(name="syn-scan")
 def syn_scan(master_task_id, dest_ip, dport):

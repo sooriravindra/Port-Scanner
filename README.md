@@ -9,71 +9,15 @@
 * Sanjay Thomas (sanjay.mathewthomas@stonybrook.edu)
 * Varun Hegde (varun.hegde@stonybrook.edu)
 
-## Flow
-  - Request Handler boots up
-  - Workers register with the request handler
-  - Upon successful registration the workers are assigned with a unique id.
-  - User submits a port scanning request to the request handler
-  - Request handler upon receiving the port scanning request distributes the jobs among the free workers.
-  - The workers upon finishing the task submit the results onto a common channel.
-  - The request handler upon receiving the port scanning response emits the results onto a channel which the web ui listens    to.
-  - The web ui renders the port scanning result upon receiving the response.
-
-## Project Structure
-
-Port-Scanner/  
-├── README.md  
-├── router //Crossbar router and web application UI  
-│   ├── Dockerfile  
-│   └── web  
-│   .    ├── favicon.ico  
-│   .    ├── index.html // HTML frontend  
-│   .    ├── loader.gif  
-│   .    ├── logo.png  
-│   .    ├── script.js // JS for frontend  
-│   .    └── main.css  
-└── scanner //Port scanning code, request handlers and workers.  
-.   ├── request\_handler.py  
-.   ├── scanner.py  
-.   ├── test.py  
-.   └── worker.py  
   
-## Run the code
+## How to run the application?
 
 ```
-   # Start Redis
-   docker run -p -d 6379:6379 redis 
-   # Start MySQL
-   docker run -v $PWD/mysql-data:/var/lib/mysql --name db -d -p 3306:3306 -e MYSQL_ROOT_PASSWORD=123 mysql:latest
-   #To enter mysql server 
-   docker exec -it db /bin/bash
-   cd scanner 
-   #Start Celery Worker
-   sudo celery -A scanner worker
-   #Start Flask
-   python -m flask run
-```
-
-## Create TABLES
-
-```
-DROP TABLE IF EXISTS `master_tasks`;
-CREATE TABLE `master_tasks` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `ip_address` varchar(45) NOT NULL,
-  `start_port` int(11) NOT NULL,
-  `end_port` int(11) NOT NULL,
-  `subnet` varchar(45) NOT NULL,
-  `task_type` varchar(45) NOT NULL,
-  PRIMARY KEY (`id`)
-);
-
-
-DROP TABLE IF EXISTS `celery_tasks`;
-CREATE TABLE `celery_tasks` (
-  `task_id` text NOT NULL,
-  `master_task_id` int(11) DEFAULT NULL
-);
+   Install docker and docker-compose
+   docker-compose build
+   docker-compose up -d
+   <!-- to stop all containers -->
+   docker compose down
 ```
 
 ## Credits

@@ -1,4 +1,7 @@
-flask
-scapy
+Flask
+kamene
 celery
 pymysql
+redis
+sqlalchemy
+cryptography

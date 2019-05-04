@@ -1,0 +1,44 @@
+version: "3"
+services:
+  web:
+    build:
+      context: ./scanner
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "5001:5001"
+    networks:
+      - gateway
+    depends_on:
+      - redis
+      - db
+
+  worker:
+    build:
+      context: ./scanner
+      dockerfile: CeleryDockerfile
+    networks:
+      - gateway
+    depends_on:
+      - redis
+      - db
+
+  db:
+    image: mysql:5.7.22
+    container_name: db
+    ports:
+      - "3306:3306"
+    networks:
+      - gateway
+    volumes:
+      - ./dump.sql:/docker-entrypoint-initdb.d/dump.sql
+    environment:
+      MYSQL_ROOT_PASSWORD: 123
+
+  redis:
+    image: redis
+    networks:
+      - gateway
+
+networks:
+  gateway: {}

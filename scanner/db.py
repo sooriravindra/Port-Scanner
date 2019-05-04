@@ -4,10 +4,12 @@ pymysql.install_as_MySQLdb()
 
 import MySQLdb
 import pickle
+import os
 
+mysql_host = "db"
 
 def associate_master_celery_task(master_task_id, task_id):
-	db = MySQLdb.connect(host="127.0.0.1",
+	db = MySQLdb.connect(host=mysql_host,
 				 user="root",
 				 passwd="123",
 				 db="test")
@@ -25,7 +27,7 @@ def associate_master_celery_task(master_task_id, task_id):
 
 def create_master_task(ip, subnet, task_type, start_port, end_port):
 	# mater_tasks
-	db = MySQLdb.connect(host="127.0.0.1",
+	db = MySQLdb.connect(host=mysql_host,
 	                     user="root",
 	                     passwd="123",
 	                     db="test")
@@ -61,7 +63,7 @@ def dataMapper(row):
 
 def get_results():
 	# Connect
-	db = MySQLdb.connect(host="127.0.0.1",
+	db = MySQLdb.connect(host=mysql_host,
 	                     user="root",
 	                     passwd="123",
 	                     db="test")

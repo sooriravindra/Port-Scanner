@@ -4,18 +4,18 @@ from db import get_results, create_master_task
 import json
 from utils import *
 
-flask_app = Flask(__name__)
+app = Flask(__name__)
 
-@flask_app.route('/')
+@app.route('/')
 def index():
 	return render_template('index.html')
 
-@flask_app.route('/get_results')
+@app.route('/get_results')
 def scan_results():
 	results = get_results()	
 	return json.dumps(results)
 
-@flask_app.route('/ping_scan', methods=['POST'])
+@app.route('/ping_scan', methods=['POST'])
 def ping_scan_request():
 	dest_ip = request.form['ip_address'] 
 	network_prefix = request.form['network_prefix']
@@ -42,7 +42,7 @@ def ping_scan_request():
 	return json.dumps({"status" : "OK"})
 
 
-@flask_app.route('/port_scan', methods=['POST'])
+@app.route('/port_scan', methods=['POST'])
 def port_scan_request():
 	
 	dest_ip = request.form['ip_address']

@@ -1,0 +1,12 @@
+FROM python:3.6
+
+ENV CELERY_BROKER_URL redis://redis:6379/0
+ENV CELERY_RESULT_BACKEND db+mysql://root:123@db:3306/test
+ENV MYSQL_HOST db
+
+COPY . /queue
+WORKDIR /queue
+
+RUN pip install -r requirements.txt
+
+ENTRYPOINT celery -A scanner worker --loglevel=info

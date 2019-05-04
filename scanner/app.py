@@ -3,6 +3,7 @@ from scanner import syn_scan,fyn_scan,grab_banner, ping_scan
 from db import get_results, create_master_task
 import json
 from utils import get_ip_range
+import re
 
 flask_app = Flask(__name__)
 
@@ -29,26 +30,27 @@ def ping_scan_request():
 	
 	return json.dumps({"status" : "OK"})
 
+def int_cast(val):
+	try:
+		val = int(val)
+	except:
+		return -1
+	return val
 
-# TODO : do input validation
 @flask_app.route('/port_scan', methods=['POST'])
 def port_scan_request():
-	dest_ip = request.form['ip_address'] 
-	network_prefix = request.form['network_prefix'] 
-	start_port = int(request.form['start_port']) 
-	end_port = int(request.form['end_port']) 
+	dest_ip = request.form['ip_address']
+	matchObj = re.match( r'^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', dest_ip, re.M)
+	if not matchObj:
+	   return json.dumps({"status" : "The IP Address provided is invalid."})
+	network_prefix = request.form['network_prefix']
+	start_port = int_cast(request.form['start_port'])
+	if start_port < 0 or start_port > 65535:
+		return json.dumps({"status" : "The starting port is invalid."})
+	end_port = int_cast(request.form['end_port'])
+	if end_port < 0 or end_port > 65535:
+		return json.dumps({"status" : "The ending port is invalid."})
 	scan_mode = request.form['scan_mode'] 
-	
-	address_list = get_ip_range(dest_ip, network_prefix) 
-
-	# wrap in a try catch
-	master_task_id = create_master_task(dest_ip, network_prefix, scan_mode, start_port, end_port)
-
-	tasks = []
-	for address in address_list:
-		for port in range(start_port, end_port + 1):
-			tasks.append((master_task_id, str(address),port))
-
 	port_scanner = None
 	
 	# decide on a correct number currently set to 5
@@ -57,7 +59,21 @@ def port_scan_request():
 	elif scan_mode == "syn_scan":
 		port_scanner = syn_scan
 	elif scan_mode == "fyn_scan":
-		port_scanner = fyn_scan 
+		port_scanner = fyn_scan
+	else:
+		return json.dumps({"status" : "The scan mode is invalid."})
+
+
+	address_list = get_ip_range(dest_ip, network_prefix) 
+
+	# wrap in a try catch
+	master_task_id = create_master_task(dest_ip, network_prefix, scan_mode, start_port, end_port)
+	print("finished create_master_task")
+
+	tasks = []
+	for address in address_list:
+		for port in range(start_port, end_port + 1):
+			tasks.append((master_task_id, str(address),port))
 
 	port_scanner.chunks(tasks, 5).apply_async()	
 	

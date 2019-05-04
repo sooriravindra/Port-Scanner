@@ -192,12 +192,36 @@
       <div class="col-sm-6 spinner"></div>
 
       <!-- Results DIV -->
-      <div class="col-sm-9 results">
+      <div class="col-sm-12 results">
         <h1 class="my-3">Results</h1>
-        <span id="refresh-data" class="fa fa-refresh fa-2x" aria-hidden="true"></span>
-        <table class="table">
-          <tbody id="scan-results"></tbody>
-        </table>
+        <div id="scan-results" style="display: none;">
+            <div id="master_header" class="row">
+                <div class="col">
+                    <h5>#</h5>
+                </div>
+                <div class="col">
+                    <h5>IP Address</h5>
+                </div>
+                <div class="col">
+                    <h5>Start Port</h5>
+                </div>
+                <div class="col">
+                    <h5>End Port</h5>
+                </div>
+                <div class="col">
+                    <h5>Subnet</h5>
+                </div>
+                <div class="col">
+                    <h5>Scan Type</h5>
+                </div>
+                <div class="col">
+                    <h5>Result</h5>
+                </div>
+            </div>
+            <div id="accordion" class="list-group">
+            </div>
+        </div>
+        <span id="refresh-data" class="fa fa-refresh fa-2x" aria-hidden="true" style="text-align: center;margin-top: 20px;"></span>
       </div>
     </div>
 

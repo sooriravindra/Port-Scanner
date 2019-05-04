@@ -55,7 +55,6 @@ def dataMapper(row):
 	result['task_status'] = row[0]
 	result['date_done'] = str(row[2])
 	result['master_task_id'] = row[3]
-	result['task_type'] = row[4]
 
 	return result
 
@@ -67,6 +66,28 @@ def get_results():
 	                     db="test")
 
 	cursor = db.cursor()
+
+	cursor.execute("SELECT * from master_tasks")
+	master_resultSet = cursor.fetchall()
+	
+	aggregate_result = {}
+	
+	for master_result in master_resultSet:
+		temp =  aggregate_result.setdefault(master_result[0],{})
+		temp['ip_address'] = master_result[1]
+		temp['start_port'] = master_result[2]
+		temp['end_port'] = master_result[3]
+		temp['subnet'] = master_result[4]
+		if master_result[5] == 'normal_scan':
+			temp['task_type'] = "Normal Scan"
+		elif master_result[5] == 'ping_scan':
+			temp['task_type'] = "Ping Scan"
+		elif master_result[5] == 'syn_scan':
+			temp['task_type'] = "SYN Scan"
+		elif master_result[5] == 'fyn_scan':
+			temp['task_type'] = "FIN Scan"
+		else:
+			temp['task_type'] = "Unknown"
 
 	cursor.execute("SELECT `celery_taskmeta`.status, \
 		`celery_taskmeta`.result, `celery_taskmeta`.date_done,\
@@ -81,17 +102,15 @@ def get_results():
 
 	results = list(map(dataMapper,resultSet)) 
 	results = list(filter(lambda row : len(row) > 0, results))
-
-	aggregate_result = {}
-
+	
 	for result in results:
 		master_task_id = result['master_task_id']
-		temp =  aggregate_result.setdefault(master_task_id,{})
+		temp =  aggregate_result[master_task_id]
 		current_open_hosts = temp.setdefault("open_hosts",[])
 		temp["open_hosts"] = current_open_hosts + result["scan_result"]
-		temp["task_type"] = result["task_type"]
-		aggregate_result[master_task_id] = temp
 		
 	db.close()
 
 	return aggregate_result
+
+get_results()

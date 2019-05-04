@@ -43,15 +43,40 @@ const submitSuccess = (requestType, status) => {
   $.get("/get_results").then(renderResults);
 };
 
+const updateRow = (id,resultCount) => {
+  var disabled = "disabled";
+  var result = "<span class='badge badge-success'>Closed</span>";
+  if (resultCount > 0) {
+    disabled = "";
+    result = "Open <span class='badge badge-pill badge-danger'>"+resultCount+"</span>";
+  }
+  $("#result_"+id).html(result);
+  $("#button_"+id).addClass(disabled);
+};
+
+var renderedIds = [];
 const renderResults = results => {
   results = JSON.parse(results);
-  const resultsParent = $("#scan-results");
-  resultsParent.html("");
+  console.log(results);
+
+  if ($.isEmptyObject(results)) {
+    return;
+  }
+
+  $("#scan-results")[0].style.display="initial";
+
+  const container = $("#accordion");
 
   for (let jobId in results) {
-    const jobTitle = getJobTitleRow(jobId, results[jobId]["task_type"]);
-    resultsParent.append(jobTitle);
-
+    if (!renderedIds.includes(jobId)) {
+      renderedIds.push(jobId);
+      const jobTitle = getJobTitleRow(jobId, results[jobId]);
+      const parentDiv = $("<div>");
+      parentDiv.append(jobTitle);
+      container.append(parentDiv);
+    }
+    updateRow(jobId,results[jobId]['open_hosts'].length);
+    /*
     const openHosts = $("<tr>", {
       id: `collapse${jobId}`,
       class: "panel-collapse collapse"
@@ -62,25 +87,71 @@ const renderResults = results => {
       openHosts.append(row);
     });
 
-    resultsParent.append(openHosts);
+    container.append(openHosts);
+    */
   }
 };
 
-const getJobTitleRow = (id, task_type) => {
-  const row = $("<tr>", {
-    class: "job-title",
-    "data-toggle": "collapse",
-    href: `#collapse${id}`
-  });
-  const column = $("<td>", {
-    text: `Request ${task_type} ${id}`
-  });
+String.prototype.replaceAll = function(search, replacement) {
+    var target = this;
+    return target.replace(new RegExp(search, 'g'), replacement);
+};
 
-  row.append(column);
-  return row;
+const getJobTitleRow = (id, resultRow) => {
+  
+  var element = `<button id="button_{id}" class="list-group-item list-group-item-action" data-toggle="collapse"
+              data-target="#collapse{id}" aria-expanded="true" aria-controls="collapse{id}">
+                  <div class="row">
+                      <div class="col">{id}</div>
+                      <div class="col">{ip_address}</div>
+                      <div class="col">{start_port}</div>
+                      <div class="col">{end_port}</div>
+                      <div class="col">{subnet}</div>
+                      <div class="col">{task_type}</div>
+                      <div id="result_{id}" class="col"></div>
+                  </div>
+              </button>`;
+  element = element.replaceAll("{id}",id);
+  element = element.replace("{ip_address}",resultRow['ip_address'])
+  element = element.replace("{start_port}",resultRow['start_port']);
+  element = element.replace("{end_port}",resultRow['end_port']);
+  element = element.replace("{subnet}",resultRow['subnet']);
+  element = element.replace("{task_type}",resultRow['task_type']);
+
+  return element;
+};
+
+const getResultHeader = (task_type) => {
+  if (task_type == "Normal Scan") {
+    return `<th scope="col">#</th>
+            <th scope="col">First</th>
+            <th scope="col">Last</th>
+            <th scope="col">Handle</th>`;
+  }
 };
 
 const getResultRow = data => {
+  var rowElem = `<tr>
+              <th scope="row">1</th>
+              <td>Mark</td>
+              <td>Otto</td>
+              <td>@mdo</td>
+            </tr>`;
+
+  var table = `<div id="collapse{id}" class="collapse" data-parent="#accordion">
+                  <div class="card-body">
+                    <table class="table table-striped">
+                      <thead>
+                        <tr>
+                          {header}
+                        </tr>
+                      </thead>
+                      <tbody>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>`;
+
   const portStatus = data["status"];
   const scanPayload = data["payload"];
   const ip = data["ip"];

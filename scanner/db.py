@@ -50,7 +50,7 @@ def dataMapper(row):
 		scan_result = list(filter(lambda host : host['status'] == 'open' or host['status'] == 'alive', scan_result))
 		result['scan_result'] = scan_result
 	except:
-		return []
+		pass
 	
 	result['task_status'] = row[0]
 	result['date_done'] = str(row[2])
@@ -72,13 +72,12 @@ def get_results():
 		`celery_taskmeta`.result, `celery_taskmeta`.date_done,\
 		`celery_tasks`.master_task_id, `master_tasks`.task_type \
 		FROM \
-		(`celery_taskmeta` INNER JOIN `celery_tasks` \
-		ON `celery_taskmeta`.task_id = `celery_tasks`.task_id) \
-		INNER JOIN `master_tasks`\
-		ON `master_tasks`.id = `celery_tasks`.master_task_id")
+		`master_tasks` INNER JOIN `celery_tasks` \
+		ON `master_tasks`.id = `celery_tasks`.master_task_id\
+		INNER JOIN `celery_taskmeta`  \
+		ON `celery_taskmeta`.task_id = `celery_tasks`.task_id")
 	
 	resultSet = cursor.fetchall()
-
 
 	results = list(map(dataMapper,resultSet)) 
 	results = list(filter(lambda row : len(row) > 0, results))

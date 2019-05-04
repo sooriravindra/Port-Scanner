@@ -12,24 +12,29 @@ $(document).ready(() => {
       $("#scan_request_modal").modal("hide");
     });
   });
-});
 
-$("#check_live_hosts").submit(function(event) {
-  event.preventDefault();
-  const data = $(this).serialize();
-  $(".spinner").show();
-  $.post("/ping_scan", data).then(status => {
-    $(".spinner").hide();
-    $("#check_live_hosts_modal").modal("hide");
+  $("#check_live_hosts").submit(function(event) {
+    event.preventDefault();
+    const data = $(this).serialize();
+    $(".spinner").show();
+    $.post("/ping_scan", data).then(status => {
+      $(".spinner").hide();
+      $("#check_live_hosts_modal").modal("hide");
+    });
+  });
+
+  $("#refresh-data").click(event => {
+    $.get("/get_results").then(renderResults);
   });
 });
 
 const renderResults = results => {
   results = JSON.parse(results);
   const resultsParent = $("#scan-results");
+  resultsParent.html("");
 
   for (let jobId in results) {
-    const jobTitle = getJobTitleRow(jobId, results[jobId]['task_type']);
+    const jobTitle = getJobTitleRow(jobId, results[jobId]["task_type"]);
     resultsParent.append(jobTitle);
 
     const openHosts = $("<tr>", {
@@ -37,7 +42,7 @@ const renderResults = results => {
       class: "panel-collapse collapse"
     });
 
-    (results[jobId]['open_hosts'] || []).forEach(result => {
+    (results[jobId]["open_hosts"] || []).forEach(result => {
       const row = getResultRow(result);
       openHosts.append(row);
     });

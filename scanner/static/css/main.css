@@ -43,6 +43,12 @@ body {
   border-top : none;
 }
 
+#refresh-data{
+  text-align: right;
+  display: block;
+  cursor: pointer;
+}
+
 footer{
   position : fixed;
   bottom: 0;

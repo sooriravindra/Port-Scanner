@@ -29,7 +29,7 @@ const renderResults = results => {
   const resultsParent = $("#scan-results");
 
   for (let jobId in results) {
-    const jobTitle = getJobTitleRow(jobId);
+    const jobTitle = getJobTitleRow(jobId, results[jobId]['task_type']);
     resultsParent.append(jobTitle);
 
     const openHosts = $("<tr>", {
@@ -37,7 +37,7 @@ const renderResults = results => {
       class: "panel-collapse collapse"
     });
 
-    results[jobId].forEach(result => {
+    (results[jobId]['open_hosts'] || []).forEach(result => {
       const row = getResultRow(result);
       openHosts.append(row);
     });
@@ -46,14 +46,14 @@ const renderResults = results => {
   }
 };
 
-const getJobTitleRow = id => {
+const getJobTitleRow = (id, task_type) => {
   const row = $("<tr>", {
     class: "job-title",
     "data-toggle": "collapse",
     href: `#collapse${id}`
   });
   const column = $("<td>", {
-    text: `Request ${id}`
+    text: `Request ${task_type} ${id}`
   });
 
   row.append(column);

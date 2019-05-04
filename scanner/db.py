@@ -47,8 +47,7 @@ def dataMapper(row):
 	
 	try:
 		scan_result = pickle.loads(row[1])
-		print(scan_result)
-		scan_result = list(filter(lambda host : host['status'] == 'open', scan_result))
+		scan_result = list(filter(lambda host : host['status'] == 'open' or host['status'] == 'alive', scan_result))
 		result['scan_result'] = scan_result
 	except:
 		return []
@@ -56,6 +55,7 @@ def dataMapper(row):
 	result['task_status'] = row[0]
 	result['date_done'] = str(row[2])
 	result['master_task_id'] = row[3]
+	result['task_type'] = row[4]
 
 	return result
 
@@ -70,10 +70,12 @@ def get_results():
 
 	cursor.execute("SELECT `celery_taskmeta`.status, \
 		`celery_taskmeta`.result, `celery_taskmeta`.date_done,\
-		`celery_tasks`.master_task_id \
+		`celery_tasks`.master_task_id, `master_tasks`.task_type \
 		FROM \
-		`celery_taskmeta` INNER JOIN `celery_tasks` \
-		on `celery_taskmeta`.task_id = `celery_tasks`.task_id")
+		(`celery_taskmeta` INNER JOIN `celery_tasks` \
+		ON `celery_taskmeta`.task_id = `celery_tasks`.task_id) \
+		INNER JOIN `master_tasks`\
+		ON `master_tasks`.id = `celery_tasks`.master_task_id")
 	
 	resultSet = cursor.fetchall()
 
@@ -85,8 +87,11 @@ def get_results():
 
 	for result in results:
 		master_task_id = result['master_task_id']
-		current_open_hosts = aggregate_result.setdefault(master_task_id,[])
-		aggregate_result[master_task_id] = current_open_hosts + result["scan_result"]
+		temp =  aggregate_result.setdefault(master_task_id,{})
+		current_open_hosts = temp.setdefault("open_hosts",[])
+		temp["open_hosts"] = current_open_hosts + result["scan_result"]
+		temp["task_type"] = result["task_type"]
+		aggregate_result[master_task_id] = temp
 		
 	db.close()
 

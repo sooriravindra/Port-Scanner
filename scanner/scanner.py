@@ -53,7 +53,7 @@ def ping_scan(master_task_id, dest_ip):
 	if response is None or is_icmp_blocked(response):
 		return {"status" : "unknown"} 
 	else:
-		return {"status" : "open", "ip" : dest_ip, "scan_type" : "ping_sweep"} 
+		return {"status" : "alive", "ip" : dest_ip} 
 
 @app.task(name="syn-scan")
 def syn_scan(master_task_id, dest_ip, dport):
@@ -71,7 +71,7 @@ def syn_scan(master_task_id, dest_ip, dport):
 		if response.getlayer(TCP).flags == 0x12:
 			# send rst if the kernel fails to send
 			send_rst = send(IP(dst=dest_ip)/TCP(sport=sport,dport=dport,flags="R"))
-			return {"status" : "open", "payload" : "", "ip" : dest_ip, "port" : dport, "scan_type" : "syn_scan"}
+			return {"status" : "open", "payload" : "", "ip" : dest_ip, "port" : dport}
 		# port is closed ACK|RST
 		elif response.getlayer(TCP).flags == 0x14:
 			return {"status" : "closed", "payload" : ""}
@@ -86,7 +86,7 @@ def fyn_scan(master_task_id, dest_ip, dport):
 
 	# if you do not get a response then the port is open
 	if response is None:
-		return {"status" : "open", "payload" : "", "ip" : dest_ip, "port" : dport, "scan_type" : "fyn_scan"}
+		return {"status" : "open", "payload" : "", "ip" : dest_ip, "port" : dport}
 
 	# if you get a RST then the port is definiely closed
 	elif response.haslayer(TCP):
@@ -127,4 +127,4 @@ def grab_banner(master_task_id, dest_ip, dport):
 
 	s.close()
 
-	return {"status" : "open", "payload" : banner, "ip" : dest_ip, "port" : dport, "scan_type" : "banner_grab"}
+	return {"status" : "open", "payload" : banner, "ip" : dest_ip, "port" : dport}

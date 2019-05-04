@@ -54,6 +54,28 @@ Port-Scanner/
    python -m flask run
 ```
 
+## Create TABLES
+
+```
+DROP TABLE IF EXISTS `master_tasks`;
+CREATE TABLE `master_tasks` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `ip_address` varchar(45) NOT NULL,
+  `start_port` int(11) NOT NULL,
+  `end_port` int(11) NOT NULL,
+  `subnet` varchar(45) NOT NULL,
+  `task_type` varchar(45) NOT NULL,
+  PRIMARY KEY (`id`)
+);
+
+
+DROP TABLE IF EXISTS `celery_tasks`;
+CREATE TABLE `celery_tasks` (
+  `task_id` text NOT NULL,
+  `master_task_id` int(11) DEFAULT NULL
+);
+```
+
 ## Credits
 
 * [Scapy](https://scapy.net/) packet crafting library.

@@ -7,14 +7,14 @@ $(document).ready(() => {
     const data = $(this).serialize();
     $(".spinner").show();
 
-    $.post("/port_scan", data).then(submitSuccess.bind(null,"port_scan"));
+    $.post("/port_scan", data).then(submitSuccess.bind(null, "port_scan"));
   });
 
   $("#check_live_hosts").submit(function(event) {
     event.preventDefault();
     const data = $(this).serialize();
     $(".spinner").show();
-    $.post("/ping_scan", data).then(submitSuccess.bind(null,"ping_scan"));
+    $.post("/ping_scan", data).then(submitSuccess.bind(null, "ping_scan"));
   });
 
   $("#refresh-data").click(event => {
@@ -22,12 +22,26 @@ $(document).ready(() => {
   });
 });
 
-const submitSuccess = (requestType, data) => {
-  const modalId = requestType === "port_scan" ? "#scan_request_modal" : "#check_live_hosts_modal";
+const submitSuccess = (requestType, status) => {
+  const modalId =
+    requestType === "port_scan"
+      ? "#scan_request_modal"
+      : "#check_live_hosts_modal";
   $(".spinner").hide();
   $(modalId).modal("hide");
-  toastr.success('Please click on the refresh button to see updated results', 'Request Submitted')
-}
+
+  status = JSON.parse(status);
+  if (status.status === "OK") {
+    toastr.success(
+      "Please click on the refresh button to see updated results",
+      "Request Submitted"
+    );
+  } else {
+    toastr.error(status.message);
+  }
+
+  $.get("/get_results").then(renderResults);
+};
 
 const renderResults = results => {
   results = JSON.parse(results);

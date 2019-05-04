@@ -2,8 +2,7 @@ from flask import Flask, render_template, request
 from scanner import syn_scan,fyn_scan,grab_banner, ping_scan
 from db import get_results, create_master_task
 import json
-from utils import get_ip_range
-import re
+from utils import *
 
 flask_app = Flask(__name__)
 
@@ -16,41 +15,51 @@ def scan_results():
 	results = get_results()	
 	return json.dumps(results)
 
-# TODO : validation
 @flask_app.route('/ping_scan', methods=['POST'])
 def ping_scan_request():
 	dest_ip = request.form['ip_address'] 
 	network_prefix = request.form['network_prefix']
 
-	master_task_id = create_master_task(dest_ip, network_prefix, "ping_scan", -1, -1)
+	if not validate_ip_address(dest_ip):
+		return json.dumps({"status" : "ERROR", "message" : "Please enter a valid ip"})
 
-	address_list = get_ip_range(dest_ip, network_prefix)
+	address_list = None
+	master_task_id = None
+
+	try:
+		address_list = get_ip_range(dest_ip, network_prefix)
+	except:
+		return json.dumps({"status" : "ERROR", "message" : "Not a valid IP4 address"})
+	
+	try:
+		master_task_id = create_master_task(dest_ip, network_prefix, "ping_scan", -1, -1)
+	except:
+		return json.dumps({"status" : "ERROR", "message" : "Database Error"})
+
 	address_list = map(lambda address : (master_task_id, str(address)), address_list)
 	ping_scan.chunks(address_list, 5).apply_async()	
 	
 	return json.dumps({"status" : "OK"})
 
-def int_cast(val):
-	try:
-		val = int(val)
-	except:
-		return -1
-	return val
 
 @flask_app.route('/port_scan', methods=['POST'])
 def port_scan_request():
+	
 	dest_ip = request.form['ip_address']
-	matchObj = re.match( r'^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$', dest_ip, re.M)
-	if not matchObj:
-	   return json.dumps({"status" : "The IP Address provided is invalid."})
 	network_prefix = request.form['network_prefix']
 	start_port = int_cast(request.form['start_port'])
-	if start_port < 0 or start_port > 65535:
-		return json.dumps({"status" : "The starting port is invalid."})
 	end_port = int_cast(request.form['end_port'])
-	if end_port < 0 or end_port > 65535:
-		return json.dumps({"status" : "The ending port is invalid."})
 	scan_mode = request.form['scan_mode'] 
+	
+	if not validate_ip_address(dest_ip):
+		return json.dumps({"status" : "ERROR", "message" : "Please enter a valid ip"})
+
+	if not validate_port(start_port):
+		return json.dumps({"status" : "ERROR", "message" : "Please enter a valid start port"})
+
+	if not validate_port(end_port):
+		return json.dumps({"status" : "ERROR", "message" : "Please enter a valid end port"})
+
 	port_scanner = None
 	
 	# decide on a correct number currently set to 5
@@ -61,14 +70,21 @@ def port_scan_request():
 	elif scan_mode == "fyn_scan":
 		port_scanner = fyn_scan
 	else:
-		return json.dumps({"status" : "The scan mode is invalid."})
+		return json.dumps({"status" : "ERROR", "message" : "The scan mode is invalid."})
 
+	address_list = None
+	master_task_id = None
 
-	address_list = get_ip_range(dest_ip, network_prefix) 
-
-	# wrap in a try catch
-	master_task_id = create_master_task(dest_ip, network_prefix, scan_mode, start_port, end_port)
-	print("finished create_master_task")
+	try:
+		address_list = get_ip_range(dest_ip, network_prefix)
+	except:
+		return json.dumps({"status" : "ERROR", "message" : "Not a valid IP4 address"})
+	
+	try:
+		master_task_id = create_master_task(dest_ip, network_prefix, scan_mode, start_port, end_port)
+	except:
+		return json.dumps({"status" : "ERROR", "message" : "Database Error"})
+	
 
 	tasks = []
 	for address in address_list:

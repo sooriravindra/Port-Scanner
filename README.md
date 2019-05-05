@@ -2,7 +2,7 @@
 
 [Description](https://www.securitee.org/teaching/cse509/projects/project2.html)
 
-![alt text](https://github.com/sooriravindra/Port-Scanner/blob/master/Block%20Diagram.png)
+![alt text](https://github.com/sooriravindra/Port-Scanner/blob/master/System%20Sec.png)
 
 ## Members : Script\_Buddies
 * Raveendra Soori (raveendra.soori@stonybrook.edu)

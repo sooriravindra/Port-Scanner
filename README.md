@@ -2,7 +2,7 @@
 
 [Description](https://www.securitee.org/teaching/cse509/projects/project2.html).
 
-![alt text](https://github.com/sooriravindra/Port-Scanner/blob/master/System%20Sec.png)
+![alt text](https://github.com/sooriravindra/Port-Scanner/blob/master/BlockDiagram.png)
 
 ## Members : Script\_Buddies
 * Raveendra Soori (raveendra.soori@stonybrook.edu)
@@ -38,7 +38,7 @@ Some of the important files to look at are:
   - **MySQL Server** - docker run -v $PWD/mysql-data:/var/lib/mysql --name db -d -p 3306:3306 -e MYSQL_ROOT_PASSWORD=123 mysql:latest
   - **Celery Workers** - sudo celery -A scanner worker
   - **Flask(for dev environment)** - python -m flask run
-  - Create additional tables, if you face trouble creating the tables directly import the SQL script in scanner/dump.sql.
+  - Create additional tables, if you face trouble creating the tables directly import the SQL script in dump.sql.
   
   ```DROP TABLE IF EXISTS `master_tasks`;
       CREATE TABLE `master_tasks` (

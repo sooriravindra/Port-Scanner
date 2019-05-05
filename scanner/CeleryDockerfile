@@ -11,4 +11,4 @@ RUN pip install -r requirements.txt
 RUN pip install --pre scapy[complete]
 
 
-ENTRYPOINT celery -A scanner worker --loglevel=info
+ENTRYPOINT ./wait-for-it.sh db:3306 -t 120 -- celery -A scanner worker --loglevel=info

@@ -6,9 +6,6 @@ $(document).ready(() => {
     event.preventDefault();
     const data = $(this).serialize();
     $(".spinner").show();
-
-    console.log(data);
-
     $.post("/port_scan", data).then(submitSuccess.bind(null, "port_scan"));
   });
 
@@ -16,7 +13,6 @@ $(document).ready(() => {
     event.preventDefault();
     const data = $(this).serialize();
     $(".spinner").show();
-    console.log(data);
     $.post("/ping_scan", data).then(submitSuccess.bind(null, "ping_scan"));
   });
 
@@ -46,27 +42,26 @@ const submitSuccess = (requestType, status) => {
   $.get("/get_results").then(renderResults);
 };
 
-const updateRow = (id,resultCount) => {
-  var disabled = "disabled";
+const updateRow = (id, resultCount) => {
   var result = "<span class='badge badge-success'>Closed</span>";
   if (resultCount > 0) {
-    disabled = "";
-    result = "Open <span class='badge badge-pill badge-danger'>"+resultCount+"</span>";
+    result =
+      "Open <span class='badge badge-pill badge-danger'>" +
+      resultCount +
+      "</span>";
   }
-  $("#result_"+id).html(result);
-  $("#button_"+id).addClass(disabled);
+  $("#result_" + id).html(result);
 };
 
 var renderedIds = [];
 const renderResults = results => {
   results = JSON.parse(results);
-  console.log(results);
 
   if ($.isEmptyObject(results)) {
     return;
   }
 
-  $("#scan-results")[0].style.display="initial";
+  $("#scan-results")[0].style.display = "initial";
 
   const container = $("#accordion");
 
@@ -78,19 +73,21 @@ const renderResults = results => {
       parentDiv.append(jobTitle);
       container.append(parentDiv);
     }
-    updateRow(jobId,results[jobId]['open_hosts'].length);
+    const openHosts = results[jobId]["open_hosts"] || [];
+    updateRow(jobId, openHosts.length);
 
-    if (results[jobId]['open_hosts'].length > 0) {
-      if ($("#hosts_"+jobId).length == 0) {
-        //The open hosts table doesn't exist yet
-        var resultBody = getResultBody(jobId,results[jobId]['open_hosts'][0]);
-        $("#button_"+jobId).parent().append(resultBody);
+    if (openHosts.length > 0) {
+      if ($("#hosts_" + jobId).length == 0) {
+        const resultBody = getResultBody(jobId, openHosts[0]);
+        $("#button_" + jobId)
+          .parent()
+          .append(resultBody);
       }
-      $("#hosts_"+jobId).html("");
+      $("#hosts_" + jobId).html("");
       let i = 1;
-      for(let open_host in results[jobId]['open_hosts']) {
-        var resultRow = getResultRow(i,results[jobId]['open_hosts'][open_host]);
-        $("#hosts_"+jobId).append(resultRow);
+      for (let open_host in openHosts) {
+        const resultRow = getResultRow(i, openHosts[open_host]);
+        $("#hosts_" + jobId).append(resultRow);
         i++;
       }
     }
@@ -98,12 +95,11 @@ const renderResults = results => {
 };
 
 String.prototype.replaceAll = function(search, replacement) {
-    var target = this;
-    return target.replace(new RegExp(search, 'g'), replacement);
+  var target = this;
+  return target.replace(new RegExp(search, "g"), replacement);
 };
 
 const getJobTitleRow = (id, resultRow) => {
-  
   var element = `<button id="button_{id}" class="list-group-item list-group-item-action" data-toggle="collapse"
               data-target="#collapse{id}" aria-expanded="true" aria-controls="collapse{id}">
                   <div class="row">
@@ -116,56 +112,53 @@ const getJobTitleRow = (id, resultRow) => {
                       <div id="result_{id}" class="col"></div>
                   </div>
               </button>`;
-  element = element.replaceAll("{id}",id);
-  element = element.replace("{ip_address}",resultRow['ip_address']);
-  if (resultRow['start_port'] != -1)
-    element = element.replace("{start_port}",resultRow['start_port']);
-  else
-    element = element.replace("{start_port}","");
-  if (resultRow['end_port'] != -1)
-    element = element.replace("{end_port}",resultRow['end_port']);
-  else
-    element = element.replace("{end_port}","");
-  var subnet = resultRow['subnet'];
-  if(!subnet)
-    subnet = "32";
-  element = element.replace("{subnet}",subnet);
-  element = element.replace("{task_type}",resultRow['task_type']);
+  element = element.replaceAll("{id}", id);
+  element = element.replace("{ip_address}", resultRow["ip_address"]);
+  if (resultRow["start_port"] != -1)
+    element = element.replace("{start_port}", resultRow["start_port"]);
+  else element = element.replace("{start_port}", "");
+  if (resultRow["end_port"] != -1)
+    element = element.replace("{end_port}", resultRow["end_port"]);
+  else element = element.replace("{end_port}", "");
+  var subnet = resultRow["subnet"];
+  if (!subnet) subnet = "32";
+  element = element.replace("{subnet}", subnet);
+  element = element.replace("{task_type}", resultRow["task_type"]);
 
   return element;
 };
 
-const getResultHeader = (hostData) => {
+const getResultHeader = hostData => {
   var header = '<th scope="col">#</th>';
 
-  if("ip" in hostData) {
+  if ("ip" in hostData) {
     header += '<th scope="col">IP Address</th>';
   }
-  if("port" in hostData) {
+  if ("port" in hostData) {
     header += '<th scope="col">Port</th>';
   }
-  if("payload" in hostData && hostData['payload']) {
+  if ("payload" in hostData && hostData["payload"]) {
     header += '<th scope="col">Response</th>';
   }
   return header;
 };
 
-const getResultRow = (index,hostData) => {
-  var row = "<tr><td>"+index+"</td>";
-  if("ip" in hostData) {
-    row += '<td>'+hostData['ip']+'</td>';
+const getResultRow = (index, hostData) => {
+  var row = "<tr><td>" + index + "</td>";
+  if ("ip" in hostData) {
+    row += "<td>" + hostData["ip"] + "</td>";
   }
-  if("port" in hostData) {
-    row += '<td>'+hostData['port']+'</td>';
+  if ("port" in hostData) {
+    row += "<td>" + hostData["port"] + "</td>";
   }
-  if("payload" in hostData && hostData['payload']) {
-    row += '<td>'+hostData['payload']+'</td>';
+  if ("payload" in hostData && hostData["payload"]) {
+    row += "<td>" + hostData["payload"] + "</td>";
   }
   row += "</tr>";
   return row;
 };
 
-const getResultBody = (id,hostData) => {
+const getResultBody = (id, hostData) => {
   var header = getResultHeader(hostData);
   var table = `<div id="collapse{id}" class="collapse" data-parent="#accordion">
                   <div class="card-body">
@@ -180,7 +173,7 @@ const getResultBody = (id,hostData) => {
                     </table>
                   </div>
                 </div>`;
-  table = table.replaceAll("{id}",id);
-  table = table.replace("{header}",header);
+  table = table.replaceAll("{id}", id);
+  table = table.replace("{header}", header);
   return table;
 };

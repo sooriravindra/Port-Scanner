@@ -52,7 +52,7 @@ def dataMapper(row):
 		scan_result = list(filter(lambda host : host['status'] == 'open' or host['status'] == 'alive', scan_result))
 		result['scan_result'] = scan_result
 	except:
-		pass
+		result['scan_result'] = []
 	
 	result['task_status'] = row[0]
 	result['date_done'] = str(row[2])
@@ -88,9 +88,7 @@ def get_results():
 			temp['task_type'] = "SYN Scan"
 		elif master_result[5] == 'fyn_scan':
 			temp['task_type'] = "FIN Scan"
-		else:
-			temp['task_type'] = "Unknown"
-
+		
 	cursor.execute("SELECT `celery_taskmeta`.status, \
 		`celery_taskmeta`.result, `celery_taskmeta`.date_done,\
 		`celery_tasks`.master_task_id, `master_tasks`.task_type \
@@ -115,4 +113,4 @@ def get_results():
 
 	return aggregate_result
 
-get_results()
+print(get_results())

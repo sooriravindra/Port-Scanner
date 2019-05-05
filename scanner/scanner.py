@@ -67,16 +67,16 @@ def checkCommonServices(dest_ip):
 @app.task(name="ping-scan")
 def ping_scan(master_task_id, dest_ip):
 	timeout = 5
-	
 	response = sr1(IP(dst=str(dest_ip))/ICMP(), timeout=timeout)
- 
+
 	if response is None or is_icmp_blocked(response):
 		# check if any services on common ports are running; if icmp is blocked
 		if checkCommonServices(dest_ip):
 			return {"status" : "alive", "ip" : dest_ip} 
 		
-		return {"status" : "unknown"} 
+		return {"status" : "not-alive"} 
 	else:
+		print({"status" : "alive", "ip" : dest_ip})
 		return {"status" : "alive", "ip" : dest_ip} 
 
 @app.task(name="syn-scan")

@@ -49,6 +49,9 @@ def dataMapper(row):
 	
 	try:
 		scan_result = pickle.loads(row[1])
+		# hack not a very good one
+		if isinstance(scan_result,dict):
+			scan_result = [scan_result]
 		scan_result = list(filter(lambda host : host['status'] == 'open' or host['status'] == 'alive', scan_result))
 		result['scan_result'] = scan_result
 	except:
@@ -102,6 +105,8 @@ def get_results():
 
 	results = list(map(dataMapper,resultSet)) 
 	results = list(filter(lambda row : len(row) > 0, results))
+
+
 	
 	for result in results:
 		master_task_id = result['master_task_id']

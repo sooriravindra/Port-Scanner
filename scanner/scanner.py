@@ -101,6 +101,11 @@ def syn_scan(master_task_id, dest_ip, dport):
 		elif response.getlayer(TCP).flags == 0x14:
 			return {"status" : "closed", "payload" : ""}
 
+	# packets have been filtered/dropped by the firewall
+	# so you would not know the status of the port
+	elif is_icmp_blocked(response):
+		return {"status" : "unknown", "payload" : "Filtered"}
+
 @app.task(name="fyn-scan")
 def fyn_scan(master_task_id, dest_ip, dport):
 
@@ -120,8 +125,8 @@ def fyn_scan(master_task_id, dest_ip, dport):
 	
 	# packets have been filtered/dropped by the firewall
 	# so you would not know the status of the port
-	elif is_icmp_blocked(response) > 0:
-		return {"status" : "unknown", "payload" : "Blocked by Firewall"}
+	elif is_icmp_blocked(response):
+		return {"status" : "unknown", "payload" : "Filtered"}
 	
 @app.task(name="grab-banner")
 def grab_banner(master_task_id, dest_ip, dport):

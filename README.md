@@ -40,8 +40,7 @@ Some of the important files to look at are:
   - **Flask(for dev environment)** - python -m flask run
   - Create additional tables, if you face trouble creating the tables directly import the SQL script in scanner/dump.sql.
   
-  ``` 
-    DROP TABLE IF EXISTS `master_tasks`;
+  ```DROP TABLE IF EXISTS `master_tasks`;
       CREATE TABLE `master_tasks` (
         `id` int(11) NOT NULL AUTO_INCREMENT,
         `ip_address` varchar(45) NOT NULL,
@@ -56,8 +55,7 @@ Some of the important files to look at are:
    CREATE TABLE `celery_tasks` (
     `task_id` text NOT NULL,
     `master_task_id` int(11) DEFAULT NULL
-  );
- ```
+  );```
 
 
 ## Ping Scan

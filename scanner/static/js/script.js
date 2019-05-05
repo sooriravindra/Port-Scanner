@@ -83,13 +83,13 @@ const renderResults = results => {
     if (results[jobId]['open_hosts'].length > 0) {
       if ($("#hosts_"+jobId).length == 0) {
         //The open hosts table doesn't exist yet
-        var resultBody = getResultBody(jobId,results[jobId]['task_type']);
+        var resultBody = getResultBody(jobId,results[jobId]['open_hosts'][0]);
         $("#button_"+jobId).parent().append(resultBody);
       }
       $("#hosts_"+jobId).html("");
       let i = 1;
       for(let open_host in results[jobId]['open_hosts']) {
-        var resultRow = getResultRow(i,results[jobId]['task_type'],results[jobId]['open_hosts'][open_host]);
+        var resultRow = getResultRow(i,results[jobId]['open_hosts'][open_host]);
         $("#hosts_"+jobId).append(resultRow);
         i++;
       }
@@ -117,38 +117,56 @@ const getJobTitleRow = (id, resultRow) => {
                   </div>
               </button>`;
   element = element.replaceAll("{id}",id);
-  element = element.replace("{ip_address}",resultRow['ip_address'])
-  element = element.replace("{start_port}",resultRow['start_port']);
-  element = element.replace("{end_port}",resultRow['end_port']);
-  element = element.replace("{subnet}",resultRow['subnet']);
+  element = element.replace("{ip_address}",resultRow['ip_address']);
+  if (resultRow['start_port'] != -1)
+    element = element.replace("{start_port}",resultRow['start_port']);
+  else
+    element = element.replace("{start_port}","");
+  if (resultRow['end_port'] != -1)
+    element = element.replace("{end_port}",resultRow['end_port']);
+  else
+    element = element.replace("{end_port}","");
+  var subnet = resultRow['subnet'];
+  if(!subnet)
+    subnet = "32";
+  element = element.replace("{subnet}",subnet);
   element = element.replace("{task_type}",resultRow['task_type']);
 
   return element;
 };
 
-const getResultHeader = (task_type) => {
-  if (task_type == "Normal Scan") {
-    return `<th scope="col">#</th>
-            <th scope="col">IP Address</th>
-            <th scope="col">Port</th>
-            <th scope="col">Banner</th>`;
+const getResultHeader = (hostData) => {
+  var header = '<th scope="col">#</th>';
+
+  if("ip" in hostData) {
+    header += '<th scope="col">IP Address</th>';
   }
+  if("port" in hostData) {
+    header += '<th scope="col">Port</th>';
+  }
+  if("payload" in hostData && hostData['payload']) {
+    header += '<th scope="col">Response</th>';
+  }
+  return header;
 };
 
-const getResultRow = (index,task_type,hostData) => {
-  if (task_type == "Normal Scan") {
-    console.log(hostData);
-    return `<tr>
-              <td>`+index+`</td>
-              <td>`+hostData['ip']+`</td>
-              <td>`+hostData['port']+`</td>
-              <td>`+hostData['payload']+`</td>
-            </tr>`;
+const getResultRow = (index,hostData) => {
+  var row = "<tr><td>"+index+"</td>";
+  if("ip" in hostData) {
+    row += '<td>'+hostData['ip']+'</td>';
   }
+  if("port" in hostData) {
+    row += '<td>'+hostData['port']+'</td>';
+  }
+  if("payload" in hostData && hostData['payload']) {
+    row += '<td>'+hostData['payload']+'</td>';
+  }
+  row += "</tr>";
+  return row;
 };
 
-const getResultBody = (id,task_type) => {
-  var header = getResultHeader(task_type);
+const getResultBody = (id,hostData) => {
+  var header = getResultHeader(hostData);
   var table = `<div id="collapse{id}" class="collapse" data-parent="#accordion">
                   <div class="card-body">
                     <table class="table table-striped">

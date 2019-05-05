@@ -31,10 +31,14 @@ def ping_scan_request():
 	address_list = None
 	master_task_id = None
 
+	if not network_prefix or not network_prefix.strip():
+		network_prefix = "32"
+
+
 	try:
 		address_list = get_ip_range(dest_ip, network_prefix)
 	except:
-		return json.dumps({"status" : "ERROR", "message" : "Not a valid IP4 address"})
+		return json.dumps({"status" : "ERROR", "message" : "Not a valid address"})
 	
 	try:
 		master_task_id = create_master_task(dest_ip, network_prefix, "ping_scan", -1, -1)
@@ -87,10 +91,14 @@ def port_scan_request():
 	address_list = None
 	master_task_id = None
 
+	if not network_prefix or not network_prefix.strip():
+		network_prefix = "32"
+
+
 	try:
 		address_list = get_ip_range(dest_ip, network_prefix)
 	except:
-		return json.dumps({"status" : "ERROR", "message" : "Not a valid IP4 address"})
+		return json.dumps({"status" : "ERROR", "message" : "Not a valid address"})
 	
 	try:
 		master_task_id = create_master_task(dest_ip, network_prefix, scan_mode, start_port, end_port)

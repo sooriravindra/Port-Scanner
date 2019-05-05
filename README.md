@@ -24,5 +24,9 @@ Application can be accessed on the http://localhost:5001/
 
 ## Credits
 
-* [Scapy](https://scapy.net/) packet crafting library.
+* [Scapy](https://scapy.net/) Packet Crafting Library
+* [Port Scanning](https://nmap.org/nmap_doc.html) Description of different port scanning techniques
+* [Celery](http://www.celeryproject.org/) Distributed Task Queue
+* [Flask](http://flask.pocoo.org/) Web Application
+* [Emulating Nmap] https://thepacketgeek.com/scapy-p-10-emulating-nmap-functions/
 * Icons by [Wichai.wi](https://www.flaticon.com/authors/wichaiwi)

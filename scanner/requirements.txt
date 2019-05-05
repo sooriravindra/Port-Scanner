@@ -1,5 +1,4 @@
 Flask
-kamene
 celery
 pymysql
 redis

@@ -4,21 +4,23 @@ services:
     build:
       context: ./scanner
       dockerfile: Dockerfile
-    restart: always
+    restart: on-failure
     ports:
       - "5001:5001"
-    networks:
-      - gateway
     depends_on:
-      - redis
       - db
+    links: 
+      - db
+      - redis
 
   worker:
     build:
       context: ./scanner
       dockerfile: CeleryDockerfile
-    networks:
-      - gateway
+    restart: on-failure
+    links: 
+      - db
+      - redis
     depends_on:
       - redis
       - db
@@ -28,8 +30,6 @@ services:
     container_name: db
     ports:
       - "3306:3306"
-    networks:
-      - gateway
     volumes:
       - ./dump.sql:/docker-entrypoint-initdb.d/dump.sql
     environment:
@@ -37,8 +37,3 @@ services:
 
   redis:
     image: redis
-    networks:
-      - gateway
-
-networks:
-  gateway: {}

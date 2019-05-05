@@ -20,6 +20,8 @@
    docker compose down
 ```
 
+Application can be accessed on the http://localhost:5001/
+
 ## Credits
 
 * [Scapy](https://scapy.net/) packet crafting library.

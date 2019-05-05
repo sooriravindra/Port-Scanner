@@ -6,7 +6,7 @@ import MySQLdb
 import pickle
 import os
 
-mysql_host = "db"
+mysql_host = os.environ.get('MYSQL_HOST', '127.0.0.1')
 
 def associate_master_celery_task(master_task_id, task_id):
 	db = MySQLdb.connect(host=mysql_host,

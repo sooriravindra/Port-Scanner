@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-from kamene.all import *
+from scapy.all import *
 import socket
 # for parsing http raw headers
 # https://stackoverflow.com/questions/4685217/parse-raw-http-headers
@@ -12,7 +12,7 @@ from celery.signals import task_prerun
 from db import associate_master_celery_task
 
 # change it to whatever you want to; we are more comfortable with MySQL as a backend
-CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'redis://localhost'),
+CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'redis://localhost')
 CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', 'db+mysql://root:123@127.0.0.1:3306/test')
 
 app = Celery('tasks', broker=CELERY_BROKER_URL, backend=CELERY_RESULT_BACKEND)

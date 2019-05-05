@@ -20,6 +20,8 @@ Some of the important files to look at are:
   
 ## How to run the application?
 
+**Note** : Please use a modern browser preferably later versions of Chrome to support Javascript ES6 syntax.
+
 - If you quickly want to get started docker-compose is the suggested solution. We **highly recommend** you to use to deploy it by using docker compose.
 
 ```

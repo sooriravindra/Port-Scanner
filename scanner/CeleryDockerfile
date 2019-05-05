@@ -7,8 +7,8 @@ ENV MYSQL_HOST db
 COPY . /queue
 WORKDIR /queue
 
-RUN pip install -r requirements.txt
-RUN pip install --pre scapy[complete]
+RUN pip install -r worker_requirements.txt
+RUN pip install --pre scapy
 
 
 ENTRYPOINT ./wait-for-it.sh db:3306 -t 120 -- celery -A scanner worker --loglevel=info

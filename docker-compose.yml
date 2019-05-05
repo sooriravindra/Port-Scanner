@@ -7,9 +7,7 @@ services:
     restart: on-failure
     ports:
       - "5001:5001"
-    depends_on:
-      - db
-    links: 
+    links:
       - db
       - redis
 
@@ -18,12 +16,9 @@ services:
       context: ./scanner
       dockerfile: CeleryDockerfile
     restart: on-failure
-    links: 
+    links:
       - db
       - redis
-    depends_on:
-      - redis
-      - db
 
   db:
     image: mysql:5.7.22

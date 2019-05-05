@@ -13,7 +13,7 @@ WORKDIR /api
 
 # install requirements
 RUN pip install -r requirements.txt
-RUN pip install --pre scapy[complete]
+RUN pip install --pre scapy
 
 # expose the app port
 EXPOSE 5001

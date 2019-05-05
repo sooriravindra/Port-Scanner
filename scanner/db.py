@@ -112,5 +112,3 @@ def get_results():
 	db.close()
 
 	return aggregate_result
-
-print(get_results())

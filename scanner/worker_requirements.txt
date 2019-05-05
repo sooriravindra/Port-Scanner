@@ -1,0 +1,5 @@
+celery
+pymysql
+redis
+sqlalchemy
+cryptography

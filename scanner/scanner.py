@@ -17,6 +17,7 @@ CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', 'db+mysql://root
 
 app = Celery('tasks', broker=CELERY_BROKER_URL, backend=CELERY_RESULT_BACKEND)
 
+ 
 # URG = 0x20
 # ACK = 0x10
 # PSH = 0x08
@@ -42,19 +43,38 @@ def is_icmp_blocked(response):
 		icmp_layer = response.getlayer(ICMP)
 		blocked = int(icmp_layer.type) == 3 and (int(icmp_layer.code) in [1,2,3,9,10,13])
 		if blocked:
-			return 1
+			return True
 		
-		return 0
+		return False
 
-	# unknown
-	return -1
+	return True
+
+def checkCommonServices(dest_ip):
+
+	portList = [21, 22, 23, 25, 53, 69, 79, 80, 110, 119, 161, 443, 8080]
+
+	for port in portList:
+		try:  
+			s = socket.socket()
+			s.settimeout(2)
+			s.connect((dest_ip, port))  
+			return True
+		except:  
+			pass 
+
+	return False
 
 @app.task(name="ping-scan")
 def ping_scan(master_task_id, dest_ip):
 	timeout = 5
+	
 	response = sr1(IP(dst=str(dest_ip))/ICMP(), timeout=timeout)
  
 	if response is None or is_icmp_blocked(response):
+		# check if any services on common ports are running; if icmp is blocked
+		if checkCommonServices(dest_ip):
+			return {"status" : "alive", "ip" : dest_ip} 
+		
 		return {"status" : "unknown"} 
 	else:
 		return {"status" : "alive", "ip" : dest_ip} 
@@ -104,8 +124,8 @@ def fyn_scan(master_task_id, dest_ip, dport):
 	
 @app.task(name="grab-banner")
 def grab_banner(master_task_id, dest_ip, dport):
-	print(dest_ip, dport)
-	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	
+	s = socket.socket()
 	s.settimeout(10)
 	banner = ""
 	try:

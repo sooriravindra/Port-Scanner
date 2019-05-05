@@ -81,5 +81,6 @@ Send the TCP packet to the remote host with only the FIN flag set, if the respon
 * [Port Scanning](https://nmap.org/nmap_doc.html) Description of different port scanning techniques
 * [Celery](http://www.celeryproject.org/) Distributed Task Queue
 * [Flask](http://flask.pocoo.org/) Web Application
+* [WaitForIt](https://github.com/vishnubob/wait-for-it) Script to wait for availibility of a host.
 * [Emulating Nmap] https://thepacketgeek.com/scapy-p-10-emulating-nmap-functions/
 * Icons by [Wichai.wi](https://www.flaticon.com/authors/wichaiwi)

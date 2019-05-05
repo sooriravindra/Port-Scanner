@@ -1,5 +1,10 @@
 import ipaddress
 import re 
+import datetime
+
+def get_current_time():
+	now = datetime.datetime.now()
+	return now.isoformat()
 
 def get_ip_range(dest_ip, network_prefix):
 

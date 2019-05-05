@@ -7,24 +7,24 @@ services:
     restart: on-failure
     ports:
       - "5001:5001"
-    links:
-      - db
-      - redis
+    networks:
+      - gateway
 
   worker:
     build:
       context: ./scanner
       dockerfile: CeleryDockerfile
     restart: on-failure
-    links:
-      - db
-      - redis
+    networks:
+      - gateway
 
   db:
     image: mysql:5.7.22
     container_name: db
     ports:
       - "3306:3306"
+    networks:
+      - gateway
     volumes:
       - ./dump.sql:/docker-entrypoint-initdb.d/dump.sql
     environment:
@@ -32,3 +32,9 @@ services:
 
   redis:
     image: redis
+    container_name: redis
+    networks:
+      - gateway
+
+networks:
+  gateway: {}

@@ -10,6 +10,7 @@ import json
 from celery import Celery
 from celery.signals import task_prerun
 from db import associate_master_celery_task
+from utils import get_current_time
 
 # change it to whatever you want to; we are more comfortable with MySQL as a backend
 CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'redis://localhost')
@@ -51,7 +52,8 @@ def is_icmp_blocked(response):
 
 def checkCommonServices(dest_ip):
 
-	portList = [21, 22, 23, 25, 53, 69, 79, 80, 110, 119, 161, 443, 8080]
+	# just a sample list; you could add custom ports to these
+	portList = [80, 21, 22, 23, 25, 53, 443, 3306, 8080]
 
 	for port in portList:
 		try:  
@@ -72,12 +74,11 @@ def ping_scan(master_task_id, dest_ip):
 	if response is None or is_icmp_blocked(response):
 		# check if any services on common ports are running; if icmp is blocked
 		if checkCommonServices(dest_ip):
-			return {"status" : "alive", "ip" : dest_ip} 
+			return {"status" : "alive", "ip" : dest_ip, "payload" : json.dumps({"finish_time" : get_current_time()})} 
 		
 		return {"status" : "not-alive"} 
 	else:
-		print({"status" : "alive", "ip" : dest_ip})
-		return {"status" : "alive", "ip" : dest_ip} 
+		return {"status" : "alive", "ip" : dest_ip, "payload" : json.dumps({"finish_time" : get_current_time()}) } 
 
 @app.task(name="syn-scan")
 def syn_scan(master_task_id, dest_ip, dport):
@@ -95,7 +96,7 @@ def syn_scan(master_task_id, dest_ip, dport):
 		if response.getlayer(TCP).flags == 0x12:
 			# send rst if the kernel fails to send
 			send_rst = send(IP(dst=dest_ip)/TCP(sport=sport,dport=dport,flags="R"))
-			return {"status" : "open", "payload" : "", "ip" : dest_ip, "port" : dport}
+			return {"status" : "open", "payload" : json.dumps({"finish_time" : get_current_time()}), "ip" : dest_ip, "port" : dport}
 		# port is closed ACK|RST
 		elif response.getlayer(TCP).flags == 0x14:
 			return {"status" : "closed", "payload" : ""}
@@ -110,7 +111,7 @@ def fyn_scan(master_task_id, dest_ip, dport):
 
 	# if you do not get a response then the port is open
 	if response is None:
-		return {"status" : "open", "payload" : "", "ip" : dest_ip, "port" : dport}
+		return {"status" : "open", "payload" : json.dumps({"finish_time" : get_current_time()}), "ip" : dest_ip, "port" : dport}
 
 	# if you get a RST then the port is definiely closed
 	elif response.haslayer(TCP):
@@ -142,6 +143,8 @@ def grab_banner(master_task_id, dest_ip, dport):
 			banner = dict(message.items())
 			banner = json.dumps(banner)
 		else:
+			message = "I am sending you garbage? \r\n" 
+			s.send(message.encode())
 			banner = s.recv(4096)
 			banner = banner.decode("utf-8")
 

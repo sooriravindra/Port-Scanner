@@ -28,8 +28,13 @@ app = Celery('tasks', broker=CELERY_BROKER_URL, backend=CELERY_RESULT_BACKEND)
 def prerun(sender=None, **kwds):
 	
 	task_id = kwds['task_id']
-	args = kwds['kwargs']['it']
-	master_task_id = args[0][0]
+	print(kwds)
+	if len(kwds['args']) == 0:
+		args = kwds['kwargs']['it']
+		master_task_id = args[0][0]
+	else:
+		args = kwds['args']
+		master_task_id = args[0]
 
 	associate_master_celery_task(master_task_id, task_id)
 

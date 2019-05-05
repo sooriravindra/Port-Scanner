@@ -3,6 +3,7 @@ from scanner import syn_scan,fyn_scan,grab_banner, ping_scan
 from db import get_results, create_master_task
 import json
 from utils import *
+from celery import group
 
 app = Flask(__name__)
 
@@ -19,6 +20,10 @@ def scan_results():
 def ping_scan_request():
 	dest_ip = request.form['ip_address'] 
 	network_prefix = request.form['network_prefix']
+	if 'sequential' in request.form:
+		sequential = request.form['sequential']
+	else:
+		sequential = False
 
 	if not validate_ip_address(dest_ip):
 		return json.dumps({"status" : "ERROR", "message" : "Please enter a valid ip"})
@@ -37,8 +42,11 @@ def ping_scan_request():
 		return json.dumps({"status" : "ERROR", "message" : "Database Error"})
 
 	address_list = map(lambda address : (master_task_id, str(address)), address_list)
-	ping_scan.chunks(address_list, 5).apply_async()	
-	
+	if not sequential:
+		ping_scan.chunks(address_list, 5).apply_async()	
+	else:
+		group([ping_scan.s(a,b) for a,b in address_list]).apply_async()	
+
 	return json.dumps({"status" : "OK"})
 
 
@@ -49,7 +57,11 @@ def port_scan_request():
 	network_prefix = request.form['network_prefix']
 	start_port = int_cast(request.form['start_port'])
 	end_port = int_cast(request.form['end_port'])
-	scan_mode = request.form['scan_mode'] 
+	scan_mode = request.form['scan_mode']
+	if 'sequential' in request.form:
+		sequential = request.form['sequential']
+	else:
+		sequential = False
 	
 	if not validate_ip_address(dest_ip):
 		return json.dumps({"status" : "ERROR", "message" : "Please enter a valid ip"})
@@ -91,6 +103,9 @@ def port_scan_request():
 		for port in range(start_port, end_port + 1):
 			tasks.append((master_task_id, str(address),port))
 
-	port_scanner.chunks(tasks, 5).apply_async()	
+	if not sequential:
+		port_scanner.chunks(tasks, 5).apply_async()	
+	else:
+		group([port_scanner.s(a,b,c) for a,b,c in tasks]).apply_async()	
 	
 	return json.dumps({"status" : "OK"})

@@ -7,6 +7,8 @@ $(document).ready(() => {
     const data = $(this).serialize();
     $(".spinner").show();
 
+    console.log(data);
+
     $.post("/port_scan", data).then(submitSuccess.bind(null, "port_scan"));
   });
 
@@ -14,6 +16,7 @@ $(document).ready(() => {
     event.preventDefault();
     const data = $(this).serialize();
     $(".spinner").show();
+    console.log(data);
     $.post("/ping_scan", data).then(submitSuccess.bind(null, "ping_scan"));
   });
 
@@ -76,19 +79,21 @@ const renderResults = results => {
       container.append(parentDiv);
     }
     updateRow(jobId,results[jobId]['open_hosts'].length);
-    /*
-    const openHosts = $("<tr>", {
-      id: `collapse${jobId}`,
-      class: "panel-collapse collapse"
-    });
 
-    (results[jobId]["open_hosts"] || []).forEach(result => {
-      const row = getResultRow(result);
-      openHosts.append(row);
-    });
-
-    container.append(openHosts);
-    */
+    if (results[jobId]['open_hosts'].length > 0) {
+      if ($("#hosts_"+jobId).length == 0) {
+        //The open hosts table doesn't exist yet
+        var resultBody = getResultBody(jobId,results[jobId]['task_type']);
+        $("#button_"+jobId).parent().append(resultBody);
+      }
+      $("#hosts_"+jobId).html("");
+      let i = 1;
+      for(let open_host in results[jobId]['open_hosts']) {
+        var resultRow = getResultRow(i,results[jobId]['task_type'],results[jobId]['open_hosts'][open_host]);
+        $("#hosts_"+jobId).append(resultRow);
+        i++;
+      }
+    }
   }
 };
 
@@ -124,20 +129,26 @@ const getJobTitleRow = (id, resultRow) => {
 const getResultHeader = (task_type) => {
   if (task_type == "Normal Scan") {
     return `<th scope="col">#</th>
-            <th scope="col">First</th>
-            <th scope="col">Last</th>
-            <th scope="col">Handle</th>`;
+            <th scope="col">IP Address</th>
+            <th scope="col">Port</th>
+            <th scope="col">Banner</th>`;
   }
 };
 
-const getResultRow = data => {
-  var rowElem = `<tr>
-              <th scope="row">1</th>
-              <td>Mark</td>
-              <td>Otto</td>
-              <td>@mdo</td>
+const getResultRow = (index,task_type,hostData) => {
+  if (task_type == "Normal Scan") {
+    console.log(hostData);
+    return `<tr>
+              <td>`+index+`</td>
+              <td>`+hostData['ip']+`</td>
+              <td>`+hostData['port']+`</td>
+              <td>`+hostData['payload']+`</td>
             </tr>`;
+  }
+};
 
+const getResultBody = (id,task_type) => {
+  var header = getResultHeader(task_type);
   var table = `<div id="collapse{id}" class="collapse" data-parent="#accordion">
                   <div class="card-body">
                     <table class="table table-striped">
@@ -146,35 +157,12 @@ const getResultRow = data => {
                           {header}
                         </tr>
                       </thead>
-                      <tbody>
+                      <tbody id="hosts_{id}">
                       </tbody>
                     </table>
                   </div>
                 </div>`;
-
-  const portStatus = data["status"];
-  const scanPayload = data["payload"];
-  const ip = data["ip"];
-  const port = data["port"];
-
-  const row = $("<tr>");
-  const ipCell = $("<td>", {
-    text: ip
-  });
-  const portCell = $("<td>", {
-    text: port
-  });
-  const portStatusCell = $("<td>", {
-    text: portStatus
-  });
-  const scanPayloadCell = $("<td>", {
-    text: scanPayload
-  });
-
-  row.append(ipCell);
-  row.append(portCell);
-  row.append(portStatusCell);
-  row.append(scanPayloadCell);
-
-  return row;
+  table = table.replaceAll("{id}",id);
+  table = table.replace("{header}",header);
+  return table;
 };
